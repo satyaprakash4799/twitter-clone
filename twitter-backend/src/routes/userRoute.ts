@@ -9,14 +9,30 @@ import {
 } from "../middleware/validators/userValidator";
 import { User } from "../models/UserModel";
 import { isUserAuthenticated } from "../middleware/auth.midddleware";
-import { DisabledToken } from "../models";
+import { DisabledToken, UserProfile } from "../models";
 
 const userRoute = express.Router();
 
 userRoute.get("/", isUserAuthenticated, async (req: Request, res: Response) => {
-  return res.json({
-    user: req.user,
-  });
+  try {
+    const user = await User.findOne({
+      where: {
+        id: req?.user?.id,
+      },
+      include: {
+        model: UserProfile,
+        as: "userProfile",
+      },
+    });
+    return res.json({
+      user,
+    });
+  } catch (error) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      error: "Something went wrong.",
+      details: error,
+    });
+  }
 });
 
 userRoute.post("/signup", async (req: Request, res: Response) => {
@@ -35,19 +51,19 @@ userRoute.post("/signup", async (req: Request, res: Response) => {
   try {
     const existingUser = await User.findOne({
       where: {
-        [Op.or] : [
+        [Op.or]: [
           {
             username: username,
             email: email,
-            phoneNumber: phoneNumber.toString()
-          }
-        ]
-      }
-    })
+            phoneNumber: phoneNumber.toString(),
+          },
+        ],
+      },
+    });
     if (existingUser) {
       return res.status(StatusCodes.CONFLICT).json({
-        message: 'User already exists.'
-      })
+        message: "User already exists.",
+      });
     }
     await User.create({
       firstName,
@@ -96,8 +112,8 @@ userRoute.post("/signin", async (req: Request, res: Response) => {
   });
   if (!user) {
     return res.status(StatusCodes.BAD_REQUEST).json({
-      message: `User doesn't exist`
-    })
+      message: `User doesn't exist`,
+    });
   }
   const isValidPassword = user?.comparePassword(password);
 
@@ -138,15 +154,77 @@ userRoute.post(
         token,
         expiresAt: exp.toISOString(),
       });
+      return res.status(StatusCodes.OK).json({
+        message: "Session expired successfully",
+      });
     } catch (error) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        error: error,
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        error: "Something went wrong.",
+        details: error,
       });
     }
-
-    return res.status(StatusCodes.OK).json({
-      message: "Session expired successfully",
-    });
   }
 );
+
+userRoute.put("/", async (req: Request, res: Response) => {
+  const { username, password, phoneNumber, email, firstName, lastName } =
+    req.body;
+
+  try {
+    const existingUser = await User.findOne({
+      where: {
+        [Op.or]: [
+          { username: username },
+          { phoneNumber: phoneNumber },
+          { email: email },
+          { firstName: firstName },
+          { lastName: lastName },
+        ],
+        id: { [Op.ne]: req.user.id },
+      },
+    });
+
+    if (existingUser) {
+      return res.status(StatusCodes.CONFLICT).json({
+        message: "Another user exists with same details.",
+      });
+    }
+    const updates: { [key: string]: any } = {};
+
+    if (username) updates.username = username;
+    if (password) updates.password = password;
+    if (phoneNumber) updates.phoneNumber = phoneNumber;
+    if (firstName) updates.firstName = firstName;
+    if (lastName) updates.lastName = lastName;
+
+    const updatedUser = await User.update(updates, {
+      where: {
+        id: req.user.id,
+      },
+    });
+
+    return res.status(StatusCodes.OK).json({
+      message: "User updated successfully.",
+      user: updatedUser,
+    });
+  } catch (error) {
+    res.status(StatusCodes.BAD_GATEWAY).json({
+      error: "Something went wrong.",
+      details: error,
+    });
+  }
+});
+
+userRoute.delete("/", (req: Request, res: Response) => {
+  try {
+    return res.status(StatusCodes.NO_CONTENT).json({
+      message: "User deleted successfully.",
+    });
+  } catch (error) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      error: "Something went wrong.",
+      details: error,
+    });
+  }
+});
 export { userRoute };

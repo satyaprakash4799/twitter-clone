@@ -2,14 +2,13 @@ import { User } from "./UserModel";
 import { DisabledToken } from "./DisabledTokenModel";
 import { UserProfile } from "./UserProfileModel";
 
-
 User.hasMany(DisabledToken, {
-  foreignKey: 'userId',
-  as: 'disabledToken'
+  foreignKey: "userId",
+  as: "disabledToken",
 });
 User.hasOne(UserProfile, {
-  foreignKey: 'userId',
-  as: 'userProfile'
-})
+  foreignKey: "userId",
+  as: "userProfile",
+});
 
-export { User, DisabledToken, UserProfile};
+export { User, DisabledToken, UserProfile };
