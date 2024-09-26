@@ -14,7 +14,7 @@ import { DisabledToken } from "../models";
 const userRoute = express.Router();
 
 userRoute.get("/", isUserAuthenticated, async (req: Request, res: Response) => {
-  res.json({
+  return res.json({
     user: req.user,
   });
 });
@@ -26,14 +26,30 @@ userRoute.post("/signup", async (req: Request, res: Response) => {
   const { error } = createUserValidator(req.body);
 
   if (error) {
-    res.status(StatusCodes.NOT_FOUND).json({
+    return res.status(StatusCodes.NOT_FOUND).json({
       error: "Validation Error",
       errors: error.details.map((err) => err.message),
     });
   }
 
   try {
-    const user = await User.create({
+    const existingUser = await User.findOne({
+      where: {
+        [Op.or] : [
+          {
+            username: username,
+            email: email,
+            phoneNumber: phoneNumber.toString()
+          }
+        ]
+      }
+    })
+    if (existingUser) {
+      return res.status(StatusCodes.CONFLICT).json({
+        message: 'User already exists.'
+      })
+    }
+    await User.create({
       firstName,
       lastName,
       phoneNumber,
@@ -41,12 +57,11 @@ userRoute.post("/signup", async (req: Request, res: Response) => {
       password,
       email,
     });
-    res.status(StatusCodes.CREATED).json({
+    return res.status(StatusCodes.CREATED).json({
       msg: "User created successfully.",
-      // user: user
     });
   } catch (error) {
-    res.status(StatusCodes.BAD_GATEWAY).json({
+    return res.status(StatusCodes.BAD_GATEWAY).json({
       error: "Something went wrong!",
       details: error,
     });
@@ -59,7 +74,7 @@ userRoute.post("/signin", async (req: Request, res: Response) => {
   const { error } = signInValidator(req.body);
 
   if (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       error: "Validation Error",
       errors: error.details.map((err) => err.message),
     });
@@ -83,7 +98,7 @@ userRoute.post("/signin", async (req: Request, res: Response) => {
   const isValidPassword = user?.comparePassword(password);
 
   if (!isValidPassword) {
-    res.status(StatusCodes.BAD_REQUEST).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       error: "Invalid credentials",
     });
   }
@@ -95,11 +110,11 @@ userRoute.post("/signin", async (req: Request, res: Response) => {
     const token = jwt.sign(payload, process.env.JWT_SECRET as string, {
       expiresIn: "1D",
     });
-    res.status(StatusCodes.OK).json({
+    return res.status(StatusCodes.OK).json({
       token,
     });
   } catch (error) {
-    res.status(StatusCodes.BAD_GATEWAY).json({
+    return res.status(StatusCodes.BAD_GATEWAY).json({
       error: "Something went wrong.",
       details: error,
     });
@@ -113,7 +128,6 @@ userRoute.post(
     const user = req.user,
       exp = new Date(user.exp * 1000);
     const token = req.headers["authorization"]?.split(" ")[1];
-    console.log(token?.length);
     try {
       await DisabledToken.create({
         userId: user.id,
@@ -126,7 +140,7 @@ userRoute.post(
       });
     }
 
-    res.status(StatusCodes.OK).json({
+    return res.status(StatusCodes.OK).json({
       message: "Session expired successfully",
     });
   }
