@@ -94,7 +94,11 @@ userRoute.post("/signin", async (req: Request, res: Response) => {
       ],
     },
   });
-
+  if (!user) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      message: `User doesn't exist`
+    })
+  }
   const isValidPassword = user?.comparePassword(password);
 
   if (!isValidPassword) {
