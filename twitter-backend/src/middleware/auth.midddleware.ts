@@ -12,7 +12,7 @@ const isUserAuthenticated = async(
   const token = authHeader?.split(" ")[1] ?? "";
 
   if (!token) {
-    res.status(StatusCodes.UNAUTHORIZED).json({
+    return res.status(StatusCodes.UNAUTHORIZED).json({
       error: "Unauthorized",
       message: "No token provided, authorization denied",
     });
@@ -29,9 +29,9 @@ const isUserAuthenticated = async(
     const user = jwt.verify(token, process.env.JWT_SECRET as string);
     req.user = user;
 
-    next();
+    return next();
   } catch (error) {
-    res.status(StatusCodes.BAD_REQUEST).json({
+    return res.status(StatusCodes.BAD_REQUEST).json({
       error: "Invalid token",
     });
   }
@@ -40,12 +40,11 @@ const isUserAuthenticated = async(
 const notAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req["headers"]["authorization"];
   const token = authHeader?.split(" ")[1] ?? "";
-
   if (!token || !req?.user) {
-    next();
+    return next();
   }
 
-  res.status(StatusCodes.UNAUTHORIZED).json({
+  return res.status(StatusCodes.UNAUTHORIZED).json({
     error: "Unauthorized",
     message: "User is already authenticated",
   });

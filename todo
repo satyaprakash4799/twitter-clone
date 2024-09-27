@@ -1,6 +1,7 @@
 Twitter:
   Backend:
     Features:
+      ☐ Need to optimize the error handling
       User Service:
         ✔ Create User api @done(24-09-26 16:38)
         ☐ Update User api

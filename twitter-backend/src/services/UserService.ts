@@ -17,7 +17,7 @@ class UserService {
           {
             username: userData?.username,
             email: userData?.email,
-            phoneNumber: userData?.phoneNumber,
+            phoneNumber: (userData?.phoneNumber)?.toString(),
           },
         ],
       },
@@ -53,13 +53,12 @@ class UserService {
       where: {
         [Op.or]: [
           { username: userData?.username },
-          { phoneNumber: userData?.phoneNumber },
+          { phoneNumber: (userData?.phoneNumber)?.toString() },
           { email: userData?.email },
         ],
         id: { [Op.ne]: userId },
       },
     });
-
     if (existingUser) {
       throw new Error("Another user exists with same details.");
     }
