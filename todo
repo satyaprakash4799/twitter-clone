@@ -1,0 +1,17 @@
+Twitter:
+  Backend:
+    Features:
+      User Service:
+        ✔ Create User api @done(24-09-26 16:38)
+        ☐ Update User api
+        ☐ Delete user api
+        ✔ Get user api @done(24-09-26 16:38)
+      User Profile:
+        ☐ create user profile
+        ☐ update user profile
+        ☐ delete user profile
+        ☐ get user profile
+      Authentication Service:
+        ✔ Login api to get the token @done(24-09-26 15:34)
+        ✔ Logout api @done(24-09-26 16:37)
+Frontend:

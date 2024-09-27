@@ -51,7 +51,7 @@ User.init(
     sequelize,
     indexes: [
       {
-        fields: ["username", "phoneNumber"],
+        fields: ["username", "phoneNumber", "email"],
         unique: true,
       },
     ],

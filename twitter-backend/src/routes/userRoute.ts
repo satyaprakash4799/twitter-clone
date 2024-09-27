@@ -166,7 +166,7 @@ userRoute.post(
   }
 );
 
-userRoute.put("/", async (req: Request, res: Response) => {
+userRoute.put("/", isUserAuthenticated, async (req: Request, res: Response) => {
   const { username, password, phoneNumber, email, firstName, lastName } =
     req.body;
 
@@ -176,9 +176,7 @@ userRoute.put("/", async (req: Request, res: Response) => {
         [Op.or]: [
           { username: username },
           { phoneNumber: phoneNumber },
-          { email: email },
-          { firstName: firstName },
-          { lastName: lastName },
+          { email: email }
         ],
         id: { [Op.ne]: req.user.id },
       },
@@ -215,7 +213,7 @@ userRoute.put("/", async (req: Request, res: Response) => {
   }
 });
 
-userRoute.delete("/", (req: Request, res: Response) => {
+userRoute.delete("/",isUserAuthenticated, (req: Request, res: Response) => {
   try {
     return res.status(StatusCodes.NO_CONTENT).json({
       message: "User deleted successfully.",
