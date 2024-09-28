@@ -5,37 +5,43 @@ import { ErrorHandler } from "../utils/ErrorHandler";
 import { StatusCodes } from "http-status-codes";
 
 class UserService {
-  public async getCurrentUser(id: string): Promise<User | null> {
-    return await User.findOne({
+  public async getCurrentUser(id: string): Promise<IUser | null> {
+    return (await User.findOne({
       where: { id },
       include: { model: UserProfile, as: "userProfile" },
-    });
+    })) as IUser | null;
   }
 
-  public async createUser(userData: IUser): Promise<User> {
+  public async createUser(
+    userData: Omit<IUser, "id" | "createdAt" | "updatedAt">
+  ): Promise<IUser> {
     const existingUser = await User.findOne({
       where: {
         [Op.or]: [
           {
             username: userData?.username,
             email: userData?.email,
-            phoneNumber: (userData?.phoneNumber)?.toString(),
+            phoneNumber: userData?.phoneNumber?.toString(),
           },
         ],
       },
-    });
+    }) as IUser | null;
     if (existingUser) {
-      throw new ErrorHandler(StatusCodes.CONFLICT, 'User already exists with these details');
+      throw new ErrorHandler(
+        StatusCodes.CONFLICT,
+        "User already exists with these details"
+      );
     }
-    const newUser = await User.create({
+    let newUser = await User.create({
       ...userData,
     });
-    return newUser;
+    return newUser.get({ plain: true }) as IUser;
   }
 
-  public async userWithPassword(
-    userData: Partial<IUser>
-  ): Promise<User | null> {
+  public async userWithPassword(userData: {
+    username: string;
+    password: string;
+  }): Promise<User | null> {
     return await User.scope("withPassword").findOne({
       where: {
         [Op.or]: [
@@ -49,9 +55,9 @@ class UserService {
 
   public async updateUser(
     userId: string,
-    userData: Partial<IUser>
-  ): Promise<[affectedCount: number, affectedUsers: User[]]> {
-    const { username='', phoneNumber='', email=''} = userData;
+    userData: Omit<IUser, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<[affectedCount: number, affectedUsers: IUser[]]> {
+    const { username = "", phoneNumber = "", email = "" } = userData;
     const existingUser = await User.findOne({
       where: {
         [Op.or]: [
@@ -61,9 +67,12 @@ class UserService {
         ],
         id: { [Op.ne]: userId },
       },
-    });
+    }) as IUser | null;
     if (existingUser) {
-      throw new ErrorHandler(StatusCodes.CONFLICT, 'User already exists with these details');
+      throw new ErrorHandler(
+        StatusCodes.CONFLICT,
+        "User already exists with these details"
+      );
     }
 
     const updates: { [key: string]: any } = {};
@@ -74,16 +83,17 @@ class UserService {
     if (userData?.firstName) updates.firstName = userData?.firstName;
     if (userData?.lastName) updates.lastName = userData?.lastName;
 
-    return await User.update(updates, {
+    const [ affectedCount, affectedUsers] = await User.update(updates, {
       where: {
         id: userId,
       },
       returning: true,
-      individualHooks: true
+      individualHooks: true,
     });
+    return [affectedCount,affectedUsers.map((user) => user.get({plain: true}) as IUser)]
   }
 
-  public async deleteUser(userId: string) {
+  public async deleteUser(userId: string): Promise<number> {
     return await User.destroy({
       where: { id: userId },
     });
