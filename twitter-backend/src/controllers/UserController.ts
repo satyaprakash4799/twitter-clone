@@ -9,7 +9,7 @@ import {
 } from "../middleware/validators/userValidator";
 import { StatusCodes } from "http-status-codes";
 import { IUser } from "../interface/userInterface";
-import { ErrorHandler } from "../utils/errorHandler";
+import { ErrorHandler } from "../utils/ErrorHandler";
 
 class UserController {
   private userService: UserService;

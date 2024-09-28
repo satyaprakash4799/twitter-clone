@@ -1,0 +1,13 @@
+{
+  "name": "twitter-clone",
+  "version": "1.0.0",
+  "description": "Sample twitter clone",
+  "author": "Satya Prakash",
+  "devDependencies": {
+    "husky": "^9.1.6"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "test": ""
+  }
+}

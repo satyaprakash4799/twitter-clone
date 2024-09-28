@@ -5,12 +5,12 @@ dotenv.config();
 
 import express, { Request, Response} from 'express';
 import { connectDB } from './config/dbConnection';
-import {userRoute} from './routes/userRoute';
 import { StatusCodes } from 'http-status-codes';
 import { errorMiddleware } from './middleware/errorMiddleware';
+import { router } from './routes';
 
 
-const _Models = require('./models');
+import * as _Models from './models';
 
 
 const app = express();
@@ -22,8 +22,12 @@ connectDB();
 // Middleware to parse incoming request
 app.use(express.json())
 
-app.use('/user', userRoute);
+// router
+app.use(router);
+
+// error middleware
 app.use(errorMiddleware);
+
 app.use('*', (req: Request, res: Response) => {
   res.status(StatusCodes.BAD_REQUEST).json({
     message:'Invalid api request.'

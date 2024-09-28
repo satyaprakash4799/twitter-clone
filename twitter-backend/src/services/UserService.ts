@@ -1,7 +1,7 @@
 import { Op } from "sequelize";
 import { IUser } from "../interface/userInterface";
 import { User, UserProfile } from "../models";
-import { ErrorHandler } from "../utils/errorHandler";
+import { ErrorHandler } from "../utils/ErrorHandler";
 import { StatusCodes } from "http-status-codes";
 
 class UserService {
