@@ -2,8 +2,9 @@ import { DataTypes, Model } from "sequelize";
 
 import { sequelize } from "../config/dbConnection";
 import { User } from "./UserModel";
+import { IUserProfile } from "../interface/userProfileInterface";
 
-class UserProfile extends Model {}
+class UserProfile extends Model<IUserProfile> {}
 
 UserProfile.init(
   {
