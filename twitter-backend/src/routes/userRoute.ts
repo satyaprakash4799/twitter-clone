@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 
 
-import { isUserAuthenticated, notAuthenticated } from "../middleware/auth.midddleware";
+import { isUserAuthenticated, notAuthenticated } from "../middleware/authMidddleware";
 import { DisabledToken } from "../models";
 import { UserController } from "../controllers/UserController";
 

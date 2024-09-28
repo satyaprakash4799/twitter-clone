@@ -7,6 +7,7 @@ import express, { Request, Response} from 'express';
 import { connectDB } from './config/dbConnection';
 import {userRoute} from './routes/userRoute';
 import { StatusCodes } from 'http-status-codes';
+import { errorMiddleware } from './middleware/errorMiddleware';
 
 
 const _Models = require('./models');
@@ -22,9 +23,10 @@ connectDB();
 app.use(express.json())
 
 app.use('/user', userRoute);
+app.use(errorMiddleware);
 app.use('*', (req: Request, res: Response) => {
   res.status(StatusCodes.BAD_REQUEST).json({
-    message:'Invalid apis.'
+    message:'Invalid api request.'
   })
 })
 

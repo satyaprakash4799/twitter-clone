@@ -1,6 +1,8 @@
 import { Op } from "sequelize";
 import { IUser } from "../interface/userInterface";
 import { User, UserProfile } from "../models";
+import { ErrorHandler } from "../utils/errorHandler";
+import { StatusCodes } from "http-status-codes";
 
 class UserService {
   public async getCurrentUser(id: string): Promise<User | null> {
@@ -23,7 +25,7 @@ class UserService {
       },
     });
     if (existingUser) {
-      throw new Error("User already exists.");
+      throw new ErrorHandler(StatusCodes.CONFLICT, 'User already exists with these details');
     }
     const newUser = await User.create({
       ...userData,
@@ -49,18 +51,19 @@ class UserService {
     userId: string,
     userData: Partial<IUser>
   ): Promise<[affectedCount: number, affectedUsers: User[]]> {
+    const { username='', phoneNumber='', email=''} = userData;
     const existingUser = await User.findOne({
       where: {
         [Op.or]: [
-          { username: userData?.username },
-          { phoneNumber: (userData?.phoneNumber)?.toString() },
-          { email: userData?.email },
+          { username: username },
+          { phoneNumber: phoneNumber },
+          { email: email },
         ],
         id: { [Op.ne]: userId },
       },
     });
     if (existingUser) {
-      throw new Error("Another user exists with same details.");
+      throw new ErrorHandler(StatusCodes.CONFLICT, 'User already exists with these details');
     }
 
     const updates: { [key: string]: any } = {};
@@ -76,6 +79,7 @@ class UserService {
         id: userId,
       },
       returning: true,
+      individualHooks: true
     });
   }
 

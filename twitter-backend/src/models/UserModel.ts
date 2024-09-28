@@ -63,9 +63,12 @@ User.init(
       afterCreate(user, opts) {
         delete user.dataValues.password;
       },
-      // beforeUpdate(instance, options) {
-
-      // },
+      beforeUpdate(user: User) {
+        if (user.changed("password" as keyof User)) {
+          user.dataValues.password = hashString(user.dataValues.password);
+        }
+      },
+      beforeBulkUpdate(instance) {},
     },
     defaultScope: {
       attributes: {
