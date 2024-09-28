@@ -1,10 +1,11 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../config/dbConnection";
 import { comparePassword as comparePwd, hashString } from "../utils/utils";
+import { IUser } from "../interface/userInterface";
 
-class User extends Model {
+class User extends Model<IUser> {
   public comparePassword(password: string) {
-    return comparePwd(password, this.dataValues.password);
+    return comparePwd(password, this.dataValues.password as string);
   }
 
   public withOutPassword() {
@@ -57,7 +58,7 @@ User.init(
     ],
     hooks: {
       beforeCreate(user) {
-        const password = user.dataValues.password;
+        const password = user.dataValues.password as string;
         user.dataValues.password = hashString(password);
       },
       afterCreate(user, opts) {
@@ -65,7 +66,7 @@ User.init(
       },
       beforeUpdate(user: User) {
         if (user.changed("password" as keyof User)) {
-          user.dataValues.password = hashString(user.dataValues.password);
+          user.dataValues.password = hashString(user.dataValues.password as string);
         }
       },
       beforeBulkUpdate(instance) {},

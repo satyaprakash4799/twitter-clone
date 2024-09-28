@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { omit } from 'lodash';
 
 import { UserService } from "../services/UserService";
 import {
@@ -10,12 +11,15 @@ import {
 import { StatusCodes } from "http-status-codes";
 import { IUser } from "../interface/userInterface";
 import { ErrorHandler } from "../utils/ErrorHandler";
+import { UserProfileService } from "../services/UserProfileService";
 
 class UserController {
   private userService: UserService;
+  private userProfileService: UserProfileService;
 
   constructor() {
     this.userService = new UserService();
+    this.userProfileService = new UserProfileService();
     this.createUser = this.createUser.bind(this);
     this.signIn = this.signIn.bind(this);
     this.getCurrentUser = this.getCurrentUser.bind(this);
@@ -25,7 +29,7 @@ class UserController {
 
   public async getCurrentUser(req: Request, res: Response) {
     try {
-      const currentUser = await this.userService.getCurrentUser(req?.user?.id);
+      const currentUser= await this.userService.getCurrentUser(req?.user?.id);
       return res.status(StatusCodes.OK).json({
         user: currentUser,
       });
@@ -50,7 +54,7 @@ class UserController {
           error?.details
         );
       }
-      await this.userService.createUser({
+      const user = await this.userService.createUser({
         firstName,
         lastName,
         username,
@@ -58,8 +62,12 @@ class UserController {
         phoneNumber,
         email,
       });
+
+      await this.userProfileService.createProfile(user?.id as string);
+
       return res.status(StatusCodes.CREATED).json({
         message: "User created successfully.",
+        user
       });
     } catch (error) {
       return next(error);
@@ -93,7 +101,7 @@ class UserController {
         throw new ErrorHandler(StatusCodes.BAD_REQUEST, "Invalid credentials");
       }
 
-      user = user?.withOutPassword();
+      user =  omit(user, 'password');
       const payload = { ...user };
       const token = jwt.sign(payload, process.env.JWT_SECRET as string, {
         expiresIn: "1D",
