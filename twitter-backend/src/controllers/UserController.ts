@@ -12,6 +12,7 @@ import { StatusCodes } from "http-status-codes";
 import { IUser } from "../interface/userInterface";
 import { ErrorHandler } from "../utils/ErrorHandler";
 import { UserProfileService } from "../services/UserProfileService";
+import { IUserProfile } from "../interface/userProfileInterface";
 
 class UserController {
   private userService: UserService;
@@ -54,7 +55,7 @@ class UserController {
           error?.details
         );
       }
-      const user = await this.userService.createUser({
+      const user: IUser = await this.userService.createUser({
         firstName,
         lastName,
         username,
@@ -63,7 +64,7 @@ class UserController {
         email,
       });
 
-      await this.userProfileService.createProfile(user?.id as string);
+      await this.userProfileService.createProfile({ userId: user?.id } as IUserProfile);
 
       return res.status(StatusCodes.CREATED).json({
         message: "User created successfully.",
@@ -95,16 +96,17 @@ class UserController {
         throw new ErrorHandler(StatusCodes.BAD_REQUEST, `User doesn't exist`);
       }
 
-      const isValidPassword = user?.comparePassword(password);
+      const isValidPassword = this.userService.comparePassword(password, user?.password as string);
 
       if (!isValidPassword) {
         throw new ErrorHandler(StatusCodes.BAD_REQUEST, "Invalid credentials");
       }
 
       user =  omit(user, 'password');
+
       const payload = { ...user };
       const token = jwt.sign(payload, process.env.JWT_SECRET as string, {
-        expiresIn: "1D",
+        expiresIn: "1W",
       });
       return res.status(StatusCodes.OK).json({
         token,

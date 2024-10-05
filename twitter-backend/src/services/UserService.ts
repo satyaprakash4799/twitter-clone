@@ -3,6 +3,7 @@ import { IUser } from "../interface/userInterface";
 import { User, UserProfile } from "../models";
 import { ErrorHandler } from "../utils/ErrorHandler";
 import { StatusCodes } from "http-status-codes";
+import { comparePassword  as cmpPwd } from "../utils/utils";
 
 class UserService {
   public async getCurrentUser(id: string): Promise<IUser | null> {
@@ -41,8 +42,8 @@ class UserService {
   public async userWithPassword(userData: {
     username: string;
     password: string;
-  }): Promise<User | null> {
-    return await User.scope("withPassword").findOne({
+  }): Promise<IUser | null> {
+    const user = await User.scope("withPassword").findOne({
       where: {
         [Op.or]: [
           { username: userData?.username },
@@ -51,8 +52,12 @@ class UserService {
         ],
       },
     });
-  }
 
+    return user?.get({plain: true}) as IUser | null;
+  }
+  public comparePassword(password:string, hashedPassword: string): boolean{
+    return cmpPwd(password, hashedPassword);
+  }
   public async updateUser(
     userId: string,
     userData: Omit<IUser, 'id' | 'createdAt' | 'updatedAt'>

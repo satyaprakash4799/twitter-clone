@@ -1,3 +1,8 @@
 export interface IUserProfile {
-  address: string;
+  id?: string;
+  address: string | null;
+  userImage: string | null;
+  userId: string;
+  createdAt?: string;
+  updatedAt?: string;
 }

@@ -2,8 +2,9 @@ import { DataTypes, Model } from "sequelize";
 
 import { sequelize } from "../config/dbConnection";
 import { User } from "./UserModel";
+import { IUserProfile } from "../interface/userProfileInterface";
 
-class UserProfile extends Model {}
+class UserProfile extends Model<IUserProfile> {}
 
 UserProfile.init(
   {
@@ -13,11 +14,11 @@ UserProfile.init(
       primaryKey: true
     },
     address: {
-      type: DataTypes.STRING(30),
+      type: DataTypes.STRING(100),
       allowNull: true,
     },
     userImage: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: true
     },
     userId: {
