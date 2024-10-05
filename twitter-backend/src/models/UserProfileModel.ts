@@ -14,11 +14,11 @@ UserProfile.init(
       primaryKey: true
     },
     address: {
-      type: DataTypes.STRING(30),
+      type: DataTypes.STRING(100),
       allowNull: true,
     },
     userImage: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: true
     },
     userId: {

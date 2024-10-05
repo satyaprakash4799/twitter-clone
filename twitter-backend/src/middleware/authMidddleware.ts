@@ -31,9 +31,7 @@ const isUserAuthenticated = async(
 
     return next();
   } catch (error) {
-    return res.status(StatusCodes.BAD_REQUEST).json({
-      error: "Invalid token",
-    });
+    return next(error);
   }
 };
 

@@ -1,12 +1,28 @@
+import { StatusCodes } from "http-status-codes";
+
+
 import { IUserProfile } from "../interface/userProfileInterface";
 import { UserProfile } from "../models";
+import { ErrorHandler } from "../utils/ErrorHandler";
 
 class UserProfileService {
-  constructor() {}
+  constructor() {
+    this.createProfile = this.createProfile.bind(this);
+    this.getUserProfile = this.getUserProfile.bind(this);
+    this.updateUserProfile = this.updateUserProfile.bind(this);
+    this.deleteUserProfile = this.deleteUserProfile.bind(this);
+  }
 
-  public async createProfile(userId: string): Promise<IUserProfile> {
+  public async createProfile(userData:IUserProfile): Promise<IUserProfile> {
+    const existingUserProfile = await this.getUserProfile(userData?.userId);
+    if (existingUserProfile) {
+      throw new ErrorHandler(StatusCodes.CONFLICT, 'User Profile already exists.')
+    }
+    const { address=null, userId, userImage=null} = userData;
     const userProfile = await UserProfile.create({
-      userId: userId,
+      userId,
+      address,
+      userImage
     });
     return userProfile.get({ plain: true }) as IUserProfile;
   }

@@ -6,6 +6,6 @@ import { userProfileRoute } from "./userProfileRoute";
 const router = express.Router();
 
 router.use("/user",    userRoute);
-router.use("/userProfile",     userProfileRoute);
+router.use("/user-profile",     userProfileRoute);
 
 export { router };

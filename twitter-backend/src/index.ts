@@ -4,6 +4,9 @@ dotenv.config();
 
 
 import express, { Request, Response} from 'express';
+import bodyParser from 'body-parser';
+import multer from 'multer';
+
 import { connectDB } from './config/dbConnection';
 import { StatusCodes } from 'http-status-codes';
 import { errorMiddleware } from './middleware/errorMiddleware';
@@ -13,6 +16,8 @@ import { router } from './routes';
 import * as _Models from './models';
 
 
+
+
 const app = express();
 const port = process.env.PORT || 4000;
 
@@ -20,7 +25,18 @@ const port = process.env.PORT || 4000;
 connectDB();
 
 // Middleware to parse incoming request
-app.use(express.json())
+// app.use(express.json())
+
+// middleware to parse incoming request
+app.use(bodyParser.json());
+// middleware to parse urlencoded request
+app.use(bodyParser.urlencoded({extended: true}));
+
+// multer configuration for form-data
+const storage = multer.memoryStorage();
+const upload = multer({storage});
+app.use(upload.any());
+
 
 // router
 app.use(router);
