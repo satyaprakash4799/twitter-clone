@@ -48,6 +48,9 @@ class UserFollowService {
       where: {
         userId,
       },
+      order: [
+        ['createdAt', 'desc']
+      ]
     });
     return followers.map((follower) =>
       follower.get({ plain: true })
@@ -56,7 +59,10 @@ class UserFollowService {
 
   public async getFollowing(followerUserId: string): Promise<IUserFollow []>{
     const following = await UserFollow.findAll({
-      where: { followerUserId}
+      where: { followerUserId},
+      order: [
+        ['createdAt', 'desc']
+      ]
     });
 
     return following.map(f=> f.get({plain: true}));
