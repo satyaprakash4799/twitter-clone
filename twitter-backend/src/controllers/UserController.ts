@@ -95,7 +95,6 @@ class UserController {
       if (!user) {
         throw new ErrorHandler(StatusCodes.BAD_REQUEST, `User doesn't exist`);
       }
-
       const isValidPassword = this.userService.comparePassword(password, user?.password as string);
 
       if (!isValidPassword) {
@@ -106,7 +105,7 @@ class UserController {
 
       const payload = { ...user };
       const token = jwt.sign(payload, process.env.JWT_SECRET as string, {
-        expiresIn: "1W",
+        expiresIn: process.env.JWT_EXPIRES_IN as string,
       });
       return res.status(StatusCodes.OK).json({
         token,

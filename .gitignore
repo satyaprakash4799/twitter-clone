@@ -34,3 +34,5 @@ lerna-debug.log*
 
 # todo
 *.todo
+
+twitter-backend/src/test/*
