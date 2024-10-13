@@ -58,7 +58,7 @@ class UserProfileService {
     return [
       affectedCount,
       affectedUserProfiles.map(
-        (profile) => profile.get({ plain: true }) as IUserProfile
+        (profile) => profile.get({ plain: true })
       ),
     ];
   }

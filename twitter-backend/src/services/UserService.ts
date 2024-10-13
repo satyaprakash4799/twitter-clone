@@ -9,7 +9,7 @@ class UserService {
   public async getCurrentUser(id: string): Promise<IUser | null> {
     return (await User.findOne({
       where: { id },
-      include: { model: UserProfile, as: "userProfile" },
+      include: [{ model: UserProfile, as: "userProfile" }],
     })) as IUser | null;
   }
 
