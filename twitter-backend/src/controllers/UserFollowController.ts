@@ -11,7 +11,7 @@ import { ErrorHandler } from "../utils/ErrorHandler";
 import { StatusCodes } from "http-status-codes";
 
 class UserFollowController {
-  private userFollowService: UserFollowService;
+  private readonly userFollowService: UserFollowService;
 
   constructor() {
     this.userFollowService = new UserFollowService();

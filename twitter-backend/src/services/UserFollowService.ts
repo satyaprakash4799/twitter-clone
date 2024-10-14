@@ -27,7 +27,7 @@ class UserFollowService {
     }
 
     const newFollower = await UserFollow.create(userData);
-    return newFollower.get({ plain: true }) as IUserFollow;
+    return newFollower.get({ plain: true });
   }
 
   public async getFollower(
@@ -54,7 +54,7 @@ class UserFollowService {
     });
     return followers.map((follower) =>
       follower.get({ plain: true })
-    ) as IUserFollow[];
+    );
   }
 
   public async getFollowing(followerUserId: string): Promise<IUserFollow []>{

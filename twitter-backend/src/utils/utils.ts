@@ -15,4 +15,7 @@ const comparePassword = (plainTextPassword: string, hashedPassword: string) => {
   }
 }
 
-export { hashString, comparePassword };
+const getOffset = (page: number, limit: number) => (page -1) * limit;
+const getTotalPages = (count: number, limit: number) => Math.ceil(count/limit);
+
+export { hashString, comparePassword, getTotalPages, getOffset };
