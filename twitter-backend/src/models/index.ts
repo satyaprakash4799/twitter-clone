@@ -14,13 +14,18 @@ User.hasOne(UserProfile, {
   as: "userProfile",
 });
 
+UserProfile.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user'
+});
+
 User.hasMany(UserFollow, {
   as: 'followers',
   foreignKey: 'userId',
 });
 
 User.hasMany(UserFollow, {
-  as: 'following',
+  as: 'followings',
   foreignKey: 'followerUserId'
 });
 
@@ -30,7 +35,8 @@ User.hasMany(UserBlock, {
 });
 
 UserBlock.belongsTo(User, {
-  as: 'blockedBy',
+  as: 'user',
   foreignKey: 'userId'
-})
+});
+
 export { User, DisabledToken, UserProfile, UserFollow, UserBlock };
