@@ -3,6 +3,7 @@ import { DisabledToken } from "./DisabledTokenModel";
 import { UserProfile } from "./UserProfileModel";
 import { UserFollow } from "./UserFollowModel";
 import { UserBlock } from "./UserBlockModel";
+import { Tweet } from "./TweetModel";
 
 User.hasMany(DisabledToken, {
   foreignKey: "userId",
@@ -39,4 +40,14 @@ UserBlock.belongsTo(User, {
   foreignKey: 'userId'
 });
 
-export { User, DisabledToken, UserProfile, UserFollow, UserBlock };
+User.hasMany(Tweet, {
+  as: 'tweets',
+  foreignKey: 'userId'
+});
+
+Tweet.belongsTo(User, {
+  as: 'user',
+  foreignKey: 'userId'
+})
+
+export { User, DisabledToken, UserProfile, UserFollow, UserBlock, Tweet };

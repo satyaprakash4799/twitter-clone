@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { TokenExpiredError } from "jsonwebtoken";
 import {
   DatabaseError,
   ForeignKeyConstraintError,
@@ -39,6 +40,12 @@ const errorMiddleware = (
   if (err instanceof ForeignKeyConstraintError) {
     statusCode = 400;
     message = "Foreign Key Constraint Error";
+  }
+
+  //Handle jwt token expiration
+  if (err instanceof TokenExpiredError){
+    statusCode = 403;
+    message = "Token expired";
   }
 
   return res.status(statusCode).json({
