@@ -9,7 +9,7 @@ const createUserProfileValidatorSchema = Joi.object({
   userImage: Joi.string().optional().messages({
     "string.base": "User image should be a string.",
   }),
-  userId: Joi.string().required().messages({
+  userId: Joi.string().uuid().required().messages({
     "string.base": "User id should be a string.",
     "string.empty": `User id can't be empty.`,
     "string.required": "User id is required.",

@@ -3,6 +3,7 @@ import { IUserBlock } from "../interface/userBlockInterface";
 import { UserBlock } from "../models/UserBlockModel";
 import { ErrorHandler } from "../utils/ErrorHandler";
 import { IPage } from "../interface/paginationInterface";
+import { User, UserProfile } from "../models";
 
 class UserBlockService {
   constructor() {
@@ -55,16 +56,28 @@ class UserBlockService {
     });
   }
 
-  public async getBlockedUsers(userId: string, { offset, limit}: IPage): Promise<[count: number, users: IUserBlock[]]> {
-    const {count, rows} = await UserBlock.findAndCountAll({
-      where: { userId},
+  public async getBlockedUsers(
+    userId: string,
+    { offset, limit }: IPage
+  ): Promise<[count: number, users: IUserBlock[]]> {
+    const { count, rows } = await UserBlock.findAndCountAll({
+      where: { userId },
+      include: [
+        {
+          model: User,
+          as: "user",
+          include: [
+            {
+              model: UserProfile,
+              as: "userProfile",
+            },
+          ],
+        },
+      ],
       limit,
-      offset
+      offset,
     });
-    return [
-      count,
-      rows.map(row => row.get({plain: true}))
-  ];
+    return [count, rows.map((row) => row.get({ plain: true }))];
   }
 }
 
