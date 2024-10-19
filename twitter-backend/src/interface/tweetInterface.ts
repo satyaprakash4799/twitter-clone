@@ -30,5 +30,4 @@ export interface ITweetLike {
   userId: string;
   tweetId: string;
   createdAt?: string;
-  updatedAt?: string;
 }

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 
-import { TweetService } from "../services/TweetService";
+import { TweetLikeService, TweetService } from "../services/TweetService";
 import {
   createTweetValidator,
   getTweetByIdValidator,
@@ -210,4 +210,165 @@ class TweetController {
   }
 }
 
-export { TweetController };
+class TweetLikeController {
+  private readonly tweetLikeService: TweetLikeService;
+  constructor() {
+    this.tweetLikeService = new TweetLikeService();
+  }
+
+  public async createLike(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { tweetId, userId } = req?.body;
+
+      const { error } = getTweetByIdValidator({ tweetId, userId });
+      if (error) {
+        throw new ErrorHandler(
+          StatusCodes.BAD_REQUEST,
+          "Validation Error",
+          error?.details
+        );
+      }
+
+      const isTweetLikeExists = await this.tweetLikeService.getLike({
+        tweetId,
+        userId,
+      });
+
+      if (isTweetLikeExists) {
+        throw new ErrorHandler(StatusCodes.CONFLICT, "Tweet is already liked");
+      }
+
+      const tweetLiked = await this.tweetLikeService.createLike({
+        tweetId,
+        userId,
+      });
+      return res.status(StatusCodes.CREATED).json({
+        message: "Tweet liked",
+        tweetLiked,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  public async getLike(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { tweetId } = req?.params, userId = req?.user?.id;
+      const { error } = getTweetByIdValidator({ tweetId, userId });
+      if (error) {
+        throw new ErrorHandler(
+          StatusCodes.BAD_REQUEST,
+          "Validation Error",
+          error?.details
+        );
+      }
+
+      const tweetLike = await this.tweetLikeService.getLike({
+        tweetId,
+        userId,
+      });
+      return res.status(StatusCodes.OK).json({
+        tweetLike,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  public async removeLike(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { tweetId } = req?.params;
+      const userId = req?.user?.id;
+      const { error } = tweetIdValidator({ tweetId });
+      if (error) {
+        throw new ErrorHandler(
+          StatusCodes.BAD_REQUEST,
+          "Validation Error",
+          error?.details
+        );
+      }
+
+      const removedTweetCount = await this.tweetLikeService.removeLike(
+        tweetId,
+        userId
+      );
+      if (!removedTweetCount) {
+        res.status(StatusCodes.OK).json({
+          message: "No tweet to unlike.",
+        });
+      }
+      return res.status(StatusCodes.NO_CONTENT).json({
+        message: "Tweet like removed successfully.",
+      });
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  public async getLikedTweetByUsers(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const page = parseInt(req?.query?.page as string) || 1,
+        limit = parseInt(req?.query?.limit as string) || 10,
+        offset = getOffset(page, limit),
+        { tweetId } = req?.params;
+
+      const { error } = tweetIdValidator({ tweetId });
+      if (error) {
+        throw new ErrorHandler(
+          StatusCodes.BAD_REQUEST,
+          "Validation Error",
+          error?.details
+        );
+      }
+      const [count, tweetsLike] =
+        await this.tweetLikeService.getLikedTweetByUsers(tweetId, {
+          offset,
+          limit,
+        });
+
+      const totalPages = getTotalPages(count, limit);
+      return res.status(StatusCodes.OK).json({
+        tweetsLike,
+        currentPage: page,
+        totalPages,
+        limit,
+        totalItems: count,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  public async getTweetLikedByUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const page = parseInt(req?.query?.page as string) || 1,
+        limit = parseInt(req?.query?.limit as string) || 10,
+        offset = getOffset(page, limit),
+        userId = req?.user?.id;
+
+      const [count, tweetsLiked] =
+        await this.tweetLikeService.getTweetLikedByUser(userId, {
+          offset,
+          limit,
+        });
+
+      const totalPages = getTotalPages(count, limit);
+      return res.status(StatusCodes.OK).json({
+        tweetsLiked,
+        currentPage: page,
+        totalPages,
+        limit,
+        totalItems: count,
+      });
+    }
+    catch(error){
+      return next(error);
+    }
+  }
+}
+
+export { TweetController, TweetLikeController };

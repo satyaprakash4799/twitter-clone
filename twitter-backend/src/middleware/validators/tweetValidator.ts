@@ -52,7 +52,7 @@ const getTweetByIdValidatorSchema = Joi.object({
     "string.empty": "`userId` can't be empty.",
     "string.required": "`userId` is required.",
   }),
-  tweetId: Joi.string().required().messages({
+  tweetId: Joi.string().uuid().required().messages({
     "string.base": "`tweetId` should be a string",
     "string.empty": "`tweetId` can't be empty.",
     "string.required": "`userId` is required.",
