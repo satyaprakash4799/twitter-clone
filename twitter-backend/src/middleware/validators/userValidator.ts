@@ -123,6 +123,15 @@ const signInValidatorSchema = Joi.object({
     }),
 }).or("username", "email", "phoneNumber");
 
+const userIdValidatorSchema = Joi.object({
+  userId: Joi.string().uuid().required().messages({
+    "string.base": "userId should be a string.",
+    "string.empty": `userId can't be empty.`,
+    "any.required": "userId is required.",
+    "any.uuid": "userId should be a  valid uuid."
+  })
+});
+
 const createUserValidator = (userData: any) => {
   return createUserValidatorSchema.validate(userData, { abortEarly: true });
 };
@@ -135,4 +144,8 @@ const updateUserValidator = (userData: any) => {
   return updateUserValidatorSchema.validate(userData, { abortEarly: true });
 };
 
-export { createUserValidator, signInValidator, updateUserValidator };
+const userIdValidator = (userData: any) => {
+  return userIdValidatorSchema.validate(userData);
+}
+
+export { createUserValidator, signInValidator, updateUserValidator, userIdValidator };

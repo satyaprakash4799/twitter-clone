@@ -1,3 +1,5 @@
+import { IUser } from "./userInterface";
+
 export enum IFEED_TYPE {
   "ALL" = 0,
   "ALL_POSTS_AND_REPLIES" = 1,
@@ -12,5 +14,6 @@ export interface IUserFollow {
   feedType: IFEED_TYPE;
   createdAt?: string;
   updatedAt?: string;
+  user?: IUser;
 
 }

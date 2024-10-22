@@ -6,6 +6,7 @@ dotenv.config();
 import express, { Request, Response} from 'express';
 import bodyParser from 'body-parser';
 import multer from 'multer';
+import cors from 'cors';
 
 import { connectDB } from './config/dbConnection';
 import { StatusCodes } from 'http-status-codes';
@@ -28,8 +29,7 @@ connectDB();
 // adding the test query script
 test
 
-// Middleware to parse incoming request
-// app.use(express.json())
+app.use(cors());
 
 // middleware to parse incoming request
 app.use(bodyParser.json());

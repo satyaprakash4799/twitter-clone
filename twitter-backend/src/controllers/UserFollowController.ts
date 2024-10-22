@@ -4,11 +4,12 @@ import { IUserFollow } from "../interface/userFollowInterface";
 import { UserFollowService } from "../services/UserFollowService";
 import {
   createUserFollowValidator,
-  getUserFollowValidator,
   updateUserFollowValidator,
 } from "../middleware/validators/userFollowValidator";
 import { ErrorHandler } from "../utils/ErrorHandler";
 import { StatusCodes } from "http-status-codes";
+import { getOffset, getTotalPages } from "../utils/utils";
+import { userIdValidator } from "../middleware/validators/userValidator";
 
 class UserFollowController {
   private readonly userFollowService: UserFollowService;
@@ -16,18 +17,13 @@ class UserFollowController {
   constructor() {
     this.userFollowService = new UserFollowService();
     this.addUserFollow = this.addUserFollow.bind(this);
-    this.getFollower = this.getFollower.bind(this);
     this.getFollowers = this.getFollowers.bind(this);
-    this.getFollowing = this.getFollowing.bind(this);
+    this.getFollowings = this.getFollowings.bind(this);
     this.updateFollower = this.updateFollower.bind(this);
     this.deleteFollower = this.deleteFollower.bind(this);
   }
 
-  public async addUserFollow(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  public async addUserFollow(req: Request, res: Response, next: NextFunction) {
     const userData = {
       userId: req?.body?.targetUserId,
       disableFeed: req?.body?.disableFeed,
@@ -45,9 +41,7 @@ class UserFollowController {
           error?.details
         );
       }
-      const userFollow = await this.userFollowService.addNewFollower(
-        userData
-      );
+      const userFollow = await this.userFollowService.addNewFollower(userData);
       return res.status(StatusCodes.CREATED).json({
         message: "Follower added successfully.",
         userFollow,
@@ -57,12 +51,14 @@ class UserFollowController {
     }
   }
 
-  public async getFollower(req: Request, res: Response, next: NextFunction) {
-    const { error } = getUserFollowValidator({
-      userId: req?.params?.targetUserId,
-      followerUserId: req?.user?.id,
-    });
+  public async getFollowers(req: Request, res: Response, next: NextFunction) {
     try {
+      const { userId } = req?.params;
+      const page = parseInt(req?.query?.page as string) || 1,
+        limit = parseInt(req?.query?.limit as string) || 10,
+        offset = getOffset(page, limit);
+
+      const { error } = userIdValidator({ userId });
       if (error) {
         throw new ErrorHandler(
           StatusCodes.BAD_REQUEST,
@@ -70,43 +66,50 @@ class UserFollowController {
           error?.details
         );
       }
-      const follower = await this.userFollowService.getFollower(
-        req?.params?.targetUserId,
-        req?.user?.id,
-      );
-
-      if (!follower) {
-        throw new ErrorHandler(StatusCodes.NOT_FOUND, "No follower details");
-      }
+      const [count, users] = await this.userFollowService.getFollowers(userId, {
+        limit,
+        offset,
+      });
+      const totalPages = getTotalPages(count, limit);
       return res.status(StatusCodes.OK).json({
-        follower,
+        currentPage: page,
+        totalPages,
+        totalItems: count,
+        users,
       });
     } catch (error) {
       return next(error);
     }
   }
 
-  public async getFollowers(req: Request, res: Response, next: NextFunction) {
+  public async getFollowings(req: Request, res: Response, next: NextFunction) {
     try {
-      const followers = await this.userFollowService.getFollowers(
-        req?.user?.id
+      const { userId } = req?.params;
+      const page = parseInt(req?.query?.page as string) || 1,
+        limit = parseInt(req?.query?.limit as string) || 10,
+        offset = getOffset(page, limit);
+
+      const { error } = userIdValidator({ userId });
+      if (error) {
+        throw new ErrorHandler(
+          StatusCodes.BAD_REQUEST,
+          "Validation Error",
+          error?.details
+        );
+      }
+      const [count, users] = await this.userFollowService.getFollowings(
+        userId,
+        { limit, offset }
       );
+      const totalPages = getTotalPages(count, limit);
       return res.status(StatusCodes.OK).json({
-        followers,
+        currentPage: page,
+        limit,
+        totalPages,
+        totalItems: count,
+        users,
       });
     } catch (error) {
-      return next(error);
-    }
-  }
-
-  public async getFollowing(req: Request, res: Response, next: NextFunction) {
-    try{
-      const following = await this.userFollowService.getFollowing(req?.user?.id);
-      return res.status(StatusCodes.OK).json({
-        following
-      });
-    }
-    catch(error) {
       return next(error);
     }
   }

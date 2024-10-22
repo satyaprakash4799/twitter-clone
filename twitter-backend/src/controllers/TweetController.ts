@@ -17,6 +17,12 @@ class TweetController {
   private readonly tweetService: TweetService;
   constructor() {
     this.tweetService = new TweetService();
+    this.createTweet = this.createTweet.bind(this);
+    this.deleteTweet = this.deleteTweet.bind(this);
+    this.getTweetById = this.getTweetById.bind(this);
+    this.getTweets = this.getTweets.bind(this);
+    this.getTweetsByUser = this.getTweetsByUser.bind(this);
+    this.updateTweet = this.updateTweet.bind(this);
   }
 
   public async getTweetById(req: Request, res: Response, next: NextFunction) {

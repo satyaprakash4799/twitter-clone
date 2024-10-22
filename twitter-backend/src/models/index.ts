@@ -25,6 +25,11 @@ User.hasMany(UserFollow, {
   foreignKey: 'userId',
 });
 
+UserFollow.belongsTo(User, {
+  foreignKey:'userId',
+  as: 'user'
+})
+
 User.hasMany(UserFollow, {
   as: 'followings',
   foreignKey: 'followerUserId'
