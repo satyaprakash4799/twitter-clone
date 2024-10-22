@@ -61,7 +61,7 @@ class UserProfileController {
   }
 
   public async updateUserProfile(req: Request, res: Response, next: NextFunction) {
-    const { address } = req.body as IUserProfile;
+    const { address, dateOfBirth } = req.body as IUserProfile;
 
     const files = req.files;
 
@@ -77,7 +77,7 @@ class UserProfileController {
       const encodedImage = userFile?.buffer.toString('base64');
       let userImage = encodedImage ? `data:${userFile.mimetype};base64, ${encodedImage}`:null;
 
-      const [count, userProfile] = await this.userProfileService.updateUserProfile(req?.user?.id, {address, userImage });
+      const [count, userProfile] = await this.userProfileService.updateUserProfile(req?.user?.id, {address, userImage, dateOfBirth });
 
       if (count ==0){ return res.status(StatusCodes.OK).json({message: 'Nothing to update.'})}
 

@@ -28,6 +28,10 @@ UserProfile.init(
         key: 'id'
       },
       allowNull: false
+    },
+    dateOfBirth: {
+      type: DataTypes.DATE,
+      allowNull: false
     }
   },
   {

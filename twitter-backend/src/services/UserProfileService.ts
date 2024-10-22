@@ -18,11 +18,12 @@ class UserProfileService {
     if (existingUserProfile) {
       throw new ErrorHandler(StatusCodes.CONFLICT, 'User Profile already exists.')
     }
-    const { address=null, userId, userImage=null} = userData;
+    const { address=null, userId, userImage=null, dateOfBirth} = userData;
     const userProfile = await UserProfile.create({
       userId,
       address,
-      userImage
+      userImage,
+      dateOfBirth
     });
     return userProfile.get({ plain: true }) as IUserProfile;
   }

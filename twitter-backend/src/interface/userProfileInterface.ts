@@ -3,6 +3,7 @@ export interface IUserProfile {
   address: string | null;
   userImage: string | null;
   userId: string;
+  dateOfBirth: string;
   createdAt?: string;
   updatedAt?: string;
 }

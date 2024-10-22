@@ -1,7 +1,8 @@
 import { StatusCodes } from "http-status-codes";
 import { IUserFollow } from "../interface/userFollowInterface";
-import { UserFollow } from "../models";
+import { User, UserFollow, UserProfile } from "../models";
 import { ErrorHandler } from "../utils/ErrorHandler";
+import { IPage } from "../interface/paginationInterface";
 
 class UserFollowService {
   constructor() {
@@ -43,29 +44,58 @@ class UserFollowService {
     return isFollowing?.get({ plain: true });
   }
 
-  public async getFollowers(userId: string): Promise<IUserFollow[]> {
-    const followers = await UserFollow.findAll({
+  public async getFollowers(
+    userId: string,
+    { limit, offset }: IPage
+  ): Promise<[count: number, users: IUserFollow[]]> {
+    const { count, rows } = await UserFollow.findAndCountAll({
+      attributes: [],
       where: {
-        userId,
+        userId: userId,
       },
-      order: [
-        ['createdAt', 'desc']
-      ]
+      include: [
+        {
+          model: User,
+          as: "user",
+          include: [
+            {
+              model: UserProfile,
+              as: "userProfile",
+            },
+          ],
+        },
+      ],
+      limit,
+      offset,
     });
-    return followers.map((follower) =>
-      follower.get({ plain: true })
-    );
+    return [count, rows.map((row) => row.get({ plain: true }))];
   }
 
-  public async getFollowing(followerUserId: string): Promise<IUserFollow []>{
-    const following = await UserFollow.findAll({
-      where: { followerUserId},
-      order: [
-        ['createdAt', 'desc']
-      ]
+  public async getFollowings(
+    userId: string,
+    { limit, offset }: IPage
+  ): Promise<[count: number, users: IUserFollow[]]> {
+    const { count, rows } = await UserFollow.findAndCountAll({
+      where: {
+        followerUserId: userId,
+      },
+      attributes: [],
+      include: [
+        {
+          model: User,
+          as: "user",
+          include: [
+            {
+              model: UserProfile,
+              as: "userProfile",
+            },
+          ],
+        },
+      ],
+      limit,
+      offset,
     });
-
-    return following.map(f=> f.get({plain: true}));
+    return [count, rows.map((row) => row.get({ plain: true }))];
   }
 
   public async updateFollower(
@@ -107,13 +137,16 @@ class UserFollowService {
     ];
   }
 
-  public async deleteFollower(userId: string, followerUserId: string): Promise<number> {
+  public async deleteFollower(
+    userId: string,
+    followerUserId: string
+  ): Promise<number> {
     return await UserFollow.destroy({
-      where:{
+      where: {
         userId,
-        followerUserId
-      }
-    })
+        followerUserId,
+      },
+    });
   }
 }
 

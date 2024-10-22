@@ -7,7 +7,7 @@ import { comparePassword as cmpPwd } from "../utils/utils";
 import { sequelize } from "../config/dbConnection";
 
 class UserService {
-  public async getCurrentUser(id: string){
+  public async getCurrentUser(id: string) {
     return (await User.findByPk(id, {
       attributes: {
         include: [

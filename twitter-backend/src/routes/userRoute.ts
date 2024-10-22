@@ -43,4 +43,5 @@ userRoute.post(
 userRoute.put("/", isUserAuthenticated, userController.updateUser);
 
 userRoute.delete("/",isUserAuthenticated, userController.deleteUser);
+
 export { userRoute };
