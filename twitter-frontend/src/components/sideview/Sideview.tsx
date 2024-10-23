@@ -2,12 +2,25 @@ import { Avatar, Box, IconButton, Tooltip } from "@mui/material";
 import XIcon from "@mui/icons-material/X";
 import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
+import { useSelector } from "react-redux";
+
+
+import { useEffect } from "react";
+import { fetchUser } from "../../store/slices/userSlice";
+import { useAppDispatch } from "../../hooks/customReduxHooks";
+import { RootState } from "../../store/store";
 
 interface SideViewProps {
-  user: any;
 }
 const SideView = (props: SideViewProps) => {
-  const { user } = props;
+  const dispatch = useAppDispatch();
+  const { user, loading, error} = useSelector((state: RootState) => state.user);
+
+  console.log(user, loading, error)
+
+  useEffect(()=> {
+    dispatch(fetchUser());
+  }, [dispatch])
   return (
     <>
       <Box
@@ -39,7 +52,7 @@ const SideView = (props: SideViewProps) => {
         <Tooltip title="Accounts">
           <Avatar
             sx={{ position: "absolute", bottom: "20px" }}
-            src={user?.userProfile?.userImage}
+            src={user?.userProfile?.userImage as string}
           ></Avatar>
         </Tooltip>
       </Box>

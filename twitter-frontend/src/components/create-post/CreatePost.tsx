@@ -17,10 +17,11 @@ import { useState } from "react";
 import CheckIcon from "@mui/icons-material/Check";
 import apiClient from "../../hooks/apiCaller";
 import { useNavigate } from "react-router-dom";
+import { IUser } from "../../types/interfaces";
+import { useAppSelector } from "../../hooks/customReduxHooks";
+import { RootState } from "../../store/store";
 
-interface CreatePostProps {
-  user: any;
-}
+interface CreatePostProps {}
 
 enum SharedToType {
   EVERYONE = "everyone",
@@ -33,7 +34,6 @@ enum IReplyType {
   ONLY_ACCOUNTS_YOU_MENTIONED = "only_account_you_mentioned",
 }
 const CreatePost = (props: CreatePostProps) => {
-  const { user } = props;
   const [menuEl, setMenuEl] = useState<null | HTMLElement>(null);
   const [showMenu, setShowMenu] = useState(false);
   const [content, setContent] = useState<string>("");
@@ -42,7 +42,10 @@ const CreatePost = (props: CreatePostProps) => {
   );
   const [replyType, setReplyType] = useState<IReplyType>(IReplyType.EVERYONE);
   const maxTweetLength = 180;
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const { user, loading, error } = useAppSelector(
+    (state: RootState) => state.user
+  );
 
   const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setShowMenu((prevValue) => {
@@ -76,9 +79,9 @@ const CreatePost = (props: CreatePostProps) => {
     }
   };
 
-  const navigateToProfile = ()=> {
-    navigate(`/${user.username}`);
-  }
+  const navigateToProfile = () => {
+    navigate(`/${user?.username}`);
+  };
   return (
     <>
       <Box
@@ -91,8 +94,11 @@ const CreatePost = (props: CreatePostProps) => {
         }}
       >
         <Divider />
-        <Box sx={{ margin: 1, cursor: 'pointer' }}>
-          <Avatar src={user?.userProfile?.userImage} onClick={navigateToProfile}></Avatar>
+        <Box sx={{ margin: 1, cursor: "pointer" }}>
+          <Avatar
+            src={user?.userProfile?.userImage as string}
+            onClick={navigateToProfile}
+          ></Avatar>
         </Box>
         <Box
           sx={{ display: "flex", flexDirection: "column", m: 1, width: "100%" }}
@@ -191,26 +197,28 @@ const CreatePost = (props: CreatePostProps) => {
                 flexDirection: "row",
               }}
             >
-              <Box sx={{ position: "relative", display: "inline-flex" }}>
-                <CircularProgress
-                  variant="determinate"
-                  value={100}
-                  thickness={5}
-                  size="25px"
-                  sx={{color: '#e0e0e0'}}
-                />
-                <CircularProgress
-                  variant="determinate"
-                  value={(content.length / maxTweetLength) * 100}
-                  thickness={5}
-                  size="25px"
-                  sx={{
-                    position: 'absolute',
-                    left: 0,
-                    top: 0
-                  }}
-                />
-              </Box>
+              { content.length > 0  && (
+                <Box sx={{ position: "relative", display: "inline-flex" }}>
+                  <CircularProgress
+                    variant="determinate"
+                    value={100}
+                    thickness={5}
+                    size="25px"
+                    sx={{ color: "#e0e0e0" }}
+                  />
+                  <CircularProgress
+                    variant="determinate"
+                    value={(content.length / maxTweetLength) * 100}
+                    thickness={5}
+                    size="25px"
+                    sx={{
+                      position: "absolute",
+                      left: 0,
+                      top: 0,
+                    }}
+                  />
+                </Box>
+              )}
 
               <Button
                 sx={{

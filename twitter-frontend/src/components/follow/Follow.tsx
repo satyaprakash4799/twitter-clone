@@ -4,6 +4,7 @@ import {
   Container,
   CssBaseline,
   IconButton,
+  Skeleton,
   Tab,
   Tabs,
   Tooltip,
@@ -14,11 +15,15 @@ import apiClient from "../../hooks/apiCaller";
 import SideView from "../../components/sideview/Sideview";
 import { IUser } from "../../types/interfaces";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAppSelector } from "../../hooks/customReduxHooks";
+import { RootState } from "../../store/store";
 
 const Follow = () => {
-  const [user, setUser] = useState<IUser | null>(null);
-  const [ followers, setFollowers ] = useState<IUser []>([]);
-  const [ followings, setFollowings ] = useState<IUser []>([]);
+  const [followers, setFollowers] = useState<IUser[]>([]);
+  const [followings, setFollowings] = useState<IUser[]>([]);
+  const { user, loading, error } = useAppSelector(
+    (store: RootState) => store.user
+  );
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,26 +56,14 @@ const Follow = () => {
   };
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data } = await apiClient.get("/user");
-      setUser(data?.user);
-    };
-    try {
-      getUser();
-    } catch (error) {
-      console.error(error);
-    }
-  }, []);
-
-  useEffect(()=> {
-    if(user){
+    if (user) {
       if (activeTabValue === 0) {
         getFollowers();
       } else {
         getFollowings();
       }
     }
-  }, [user])
+  }, [user]);
 
   useEffect(() => {
     const currentTab = tabPaths.indexOf(location.pathname);
@@ -93,7 +86,7 @@ const Follow = () => {
     <>
       <CssBaseline />
       <Container maxWidth="lg" sx={{ display: "flex" }}>
-        <SideView user={user} />
+        <SideView />
         <Box
           sx={{ display: "flex", width: "inherit", flexDirection: "column" }}
         >
@@ -111,13 +104,30 @@ const Follow = () => {
               </IconButton>
             </Tooltip>
             <Box sx={{ display: "flex", flexDirection: "column" }}>
-              {user && (
+              {loading ? (
+                <Skeleton
+                  animation="wave"
+                  variant="text"
+                  sx={{ width: "100px" }}
+                />
+              ) : (
                 <span style={{ fontWeight: "bold" }}>
                   {" "}
                   {user?.firstName} {user?.lastName}
                 </span>
               )}
-              <span> 0 post</span>
+              {loading ? (
+                <Skeleton
+                  animation="wave"
+                  variant="text"
+                  sx={{ width: "100px" }}
+                />
+              ) : (
+                <span>
+                  {" "}
+                  {user?.tweetsCount} {user?.tweetsCount ? "posts" : "post"}
+                </span>
+              )}
             </Box>
           </Box>
           <Box sx={{ flex: "0 0 100%" }}>

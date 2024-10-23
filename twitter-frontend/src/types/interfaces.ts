@@ -19,4 +19,5 @@ export interface IUser {
   userProfile: IUserProfile;
   followingsCount: number;
   followersCount: number
+  tweetsCount: number;
 }

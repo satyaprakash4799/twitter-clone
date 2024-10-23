@@ -1,3 +1,5 @@
+import { IUserProfile } from "./userProfileInterface";
+
 export interface IUser {
   id?: string;
   firstName: string;
@@ -8,4 +10,8 @@ export interface IUser {
   phoneNumber: string;
   createdAt?: string;
   updatedAt?: string;
+  followersCount?: number;
+  followingsCount?: number;
+  userProfile?:IUserProfile;
+  tweetsCount?: number;
 }
