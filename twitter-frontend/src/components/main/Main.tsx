@@ -1,14 +1,12 @@
 import { Box, Tab, Tabs } from "@mui/material";
 import { useState } from "react";
 import CreatePost from "../create-post/CreatePost";
+import { IUser } from "../../types/interfaces";
 
-
-interface MainProps { 
-  user: any;
+interface MainProps {
 }
 const Main = (props: MainProps) => {
-  const { user } = props;
-  const [activeTabValue, setActiveTabValue ]= useState(0);
+  const [activeTabValue, setActiveTabValue] = useState(0);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTabValue(newValue);
@@ -16,18 +14,18 @@ const Main = (props: MainProps) => {
 
   return (
     <>
-      <Box sx={{flex: '0 0 100%' }}>
+      <Box sx={{ flex: "0 0 100%" }}>
         <Tabs
           value={activeTabValue}
           onChange={handleTabChange}
           aria-label="tabs"
           variant="fullWidth"
         >
-          <Tab label="For you" sx={{textTransform: 'none'}}/>
-          <Tab label="Following" sx={{textTransform: 'none'}}/>
+          <Tab label="For you" sx={{ textTransform: "none" }} />
+          <Tab label="Following" sx={{ textTransform: "none" }} />
         </Tabs>
         <Box>
-          <CreatePost user={user}/>
+          <CreatePost />
           <CustomTabPanel index={0} value={activeTabValue}></CustomTabPanel>
           <CustomTabPanel index={1} value={activeTabValue}></CustomTabPanel>
         </Box>
@@ -55,6 +53,6 @@ const CustomTabPanel = (props: TabPanelProps) => {
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
-}
+};
 
 export default Main;

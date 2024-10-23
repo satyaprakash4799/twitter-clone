@@ -28,17 +28,14 @@ class UserController {
     this.deleteUser = this.deleteUser.bind(this);
   }
 
-  public async getCurrentUser(req: Request, res: Response) {
+  public async getCurrentUser(req: Request, res: Response, next: NextFunction) {
     try {
       const currentUser= await this.userService.getCurrentUser(req?.user?.id);
       return res.status(StatusCodes.OK).json({
         user: currentUser,
       });
     } catch (error) {
-      return res.status(StatusCodes.BAD_GATEWAY).json({
-        error: "Something went wrong.",
-        details: error,
-      });
+      return next(error);
     }
   }
 

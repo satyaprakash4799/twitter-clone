@@ -25,12 +25,16 @@ class UserService {
             ),
             "followingsCount",
           ],
+          [
+            sequelize.literal(
+              `(SELECT COUNT(*) FROM "Tweets" WHERE "Tweets"."userId" = "User"."id")`,
+            ),
+            'tweetsCount'
+          ]
         ],
       },
       include: [
         { model: UserProfile, as: "userProfile" },
-        // { model: UserFollow, as: "followers", attributes: [] }, // Remove specific attributes as they are calculated
-        // { model: UserFollow, as: "followings", attributes: [] }, // Same as above
       ],
     })) as IUser | null;
   }

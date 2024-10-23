@@ -4,37 +4,30 @@ import {
   Container,
   CssBaseline,
   IconButton,
+  Skeleton,
   Tooltip,
+  Typography,
 } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import EggIcon from "@mui/icons-material/Egg";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import moment from "moment";
+import { useSelector } from "react-redux";
 
-import apiClient from "../../hooks/apiCaller";
-import { IUser } from "../../types/interfaces";
 import SideView from "../sideview/Sideview";
+import { RootState } from "../../store/store";
+import Loader from "../../hooks/loader";
 
 const Profile = () => {
-  const [user, setUser] = useState<IUser | null>(null);
-  const location = useLocation();
+  const {
+    user,
+    loading,
+    error: _error,
+  } = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const { data } = await apiClient.get("/user");
-        setUser(data.user);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    getUser();
-  }, [location.pathname]);
 
   const navigateToHomepage = () => {
     navigate("/home");
@@ -43,7 +36,7 @@ const Profile = () => {
     <>
       <CssBaseline />
       <Container maxWidth="lg" sx={{ display: "flex" }}>
-        <SideView user={user} />
+        <SideView />
         <Box
           sx={{ display: "flex", width: "inherit", flexDirection: "column" }}
         >
@@ -60,14 +53,41 @@ const Profile = () => {
                 <ArrowBackIcon />
               </IconButton>
             </Tooltip>
-            <Box sx={{ display: "flex", flexDirection: "column" }}>
-              {user && (
-                <span style={{ fontWeight: "bold" }}>
-                  {" "}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                cursor: "pointer",
+              }}
+            >
+              {loading ? (
+                <Box typography="span">
+                  <Skeleton
+                    animation="wave"
+                    variant="text"
+                    sx={{ width: "100px" }}
+                  />
+                </Box>
+              ) : (
+                <Typography style={{ fontWeight: "bold" }}>
                   {user?.firstName} {user?.lastName}
-                </span>
+                </Typography>
               )}
-              <span> 0 post</span>
+              <span>
+                {loading ? (
+                  <Box typography="span">
+                    <Skeleton
+                      animation="wave"
+                      variant="text"
+                      sx={{ width: "100px" }}
+                    />
+                  </Box>
+                ) : (
+                  <Box typography={"span"}>
+                    {user?.tweetsCount} {user?.tweetsCount ? "posts" : "post"}
+                  </Box>
+                )}
+              </span>
             </Box>
           </Box>
           <Box
@@ -85,9 +105,18 @@ const Profile = () => {
                 alignItems: "center",
               }}
             >
-              <span style={{ fontWeight: 800 }}>
-                {user?.firstName} {user?.lastName}{" "}
-              </span>
+              {loading ? (
+                <Skeleton
+                  animation="wave"
+                  variant="text"
+                  sx={{ width: "100px" }}
+                />
+              ) : (
+                <Box typography={"span"} sx={{ fontWeight: "bold" }}>
+                  {user?.firstName} {user?.lastName}{" "}
+                </Box>
+              )}
+
               <Button
                 startIcon={
                   <CheckCircleIcon
@@ -107,9 +136,17 @@ const Profile = () => {
                 Get verified
               </Button>
             </Box>
-            <Box typography={"span"} sx={{ color: "rgb(83, 100, 113)" }}>
-              @{user?.username}
-            </Box>
+            {loading ? (
+              <Skeleton
+                animation="wave"
+                variant="text"
+                sx={{ width: "100px" }}
+              />
+            ) : (
+              <Box typography={"span"} sx={{ color: "rgb(83, 100, 113)" }}>
+                @{user?.username}
+              </Box>
+            )}
             <Box
               sx={{
                 color: "rgb(83, 100, 113)",
@@ -124,40 +161,64 @@ const Profile = () => {
                 sx={{
                   display: "flex",
                   flexDirection: "row",
-                  gap: "5px",
+                  gap: 1,
                 }}
               >
                 <LocationOnIcon></LocationOnIcon>
-                <Box typography={"span"}>{user?.userProfile?.address}</Box>
+                {loading ? (
+                  <Skeleton
+                    animation="wave"
+                    variant="text"
+                    sx={{ width: "100px" }}
+                  />
+                ) : (
+                  <Box typography={"span"}>{user?.userProfile?.address}</Box>
+                )}
               </Box>
               <Box
                 sx={{
                   display: "flex",
                   flexDirection: "row",
-                  gap: "5px",
+                  gap: 1,
                 }}
               >
                 <EggIcon />
-                <Box typography={"span"}>
-                  {" "}
-                  Born{" "}
-                  {moment(user?.userProfile?.dateOfBirth).format(
-                    "MMMM D, YYYY"
-                  )}
-                </Box>
+                {loading ? (
+                  <Skeleton
+                    animation="wave"
+                    variant="text"
+                    sx={{ width: "100px" }}
+                  />
+                ) : (
+                  <Box typography={"span"}>
+                    {" "}
+                    Born{" "}
+                    {moment(user?.userProfile?.dateOfBirth).format(
+                      "MMMM D, YYYY"
+                    )}
+                  </Box>
+                )}
               </Box>
               <Box
                 sx={{
                   display: "flex",
                   flexDirection: "row",
-                  gap: "5px",
+                  gap: 1,
                 }}
               >
                 <CalendarMonthIcon />
-                <Box typography={"span"}>
-                  {" "}
-                  Joined {moment(user?.createdAt).format("MMMM YYYY")}
-                </Box>
+                {loading ? (
+                  <Skeleton
+                    animation="wave"
+                    variant="text"
+                    sx={{ width: "100px" }}
+                  />
+                ) : (
+                  <Box typography={"span"}>
+                    {" "}
+                    Joined {moment(user?.createdAt).format("MMMM YYYY")}
+                  </Box>
+                )}
               </Box>
             </Box>
             <Box sx={{ display: "flex", flexDirection: "row", gap: 3 }}>
@@ -165,7 +226,7 @@ const Profile = () => {
                 sx={{
                   display: "flex",
                   flexDirection: "row",
-                  gap: 1,
+                  gap: "5px",
                   cursor: "pointer",
                   "&:hover": {
                     borderBottom: "1px solid #000",
@@ -173,9 +234,17 @@ const Profile = () => {
                 }}
                 onClick={() => navigate(`/${user?.username}/followers`)}
               >
-                <Box typography={"span"} sx={{ fontWeight: 800 }}>
-                  {user?.followingsCount}
-                </Box>
+                {loading ? (
+                  <Skeleton
+                    animation="wave"
+                    variant="text"
+                    sx={{ width: "10px" }}
+                  />
+                ) : (
+                  <Box typography={"span"} sx={{ fontWeight: 800 }}>
+                    {user?.followingsCount}
+                  </Box>
+                )}
                 <Box typography={"span"} color={"rgb(83, 100, 113)"}>
                   Following
                 </Box>
@@ -184,7 +253,7 @@ const Profile = () => {
                 sx={{
                   display: "flex",
                   flexDirection: "row",
-                  gap: 1,
+                  gap: "5px",
                   cursor: "pointer",
                   "&:hover": {
                     borderBottom: "1px solid #000",
@@ -192,9 +261,17 @@ const Profile = () => {
                 }}
                 onClick={() => navigate(`/${user?.username}/followings`)}
               >
-                <Box typography={"span"} sx={{ fontWeight: 800 }}>
-                  {user?.followersCount}
-                </Box>
+                {loading ? (
+                  <Skeleton
+                    animation="wave"
+                    variant="text"
+                    sx={{ width: "10px" }}
+                  />
+                ) : (
+                  <Box typography={"span"} sx={{ fontWeight: 800 }}>
+                    {user?.followersCount}
+                  </Box>
+                )}
                 <Box typography={"span"} color={"rgb(83, 100, 113)"}>
                   Followers
                 </Box>
