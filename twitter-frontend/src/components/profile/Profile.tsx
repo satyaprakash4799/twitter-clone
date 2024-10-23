@@ -8,7 +8,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -19,19 +19,32 @@ import { useSelector } from "react-redux";
 
 import SideView from "../sideview/Sideview";
 import { RootState } from "../../store/store";
-import Loader from "../../hooks/loader";
+import { useEffect } from "react";
+import { fetchUser } from "../../store/slices/userSlice";
+import { useAppDispatch } from "../../hooks/customReduxHooks";
 
 const Profile = () => {
+  const dispatch = useAppDispatch();
   const {
     user,
     loading,
     error: _error,
   } = useSelector((state: RootState) => state.user);
+  const location = useLocation();
+  const params = useParams();
   const navigate = useNavigate();
 
   const navigateToHomepage = () => {
     navigate("/home");
   };
+
+  useEffect(() => {
+    const { username } = params;
+    if (username) {
+      dispatch(fetchUser(username));
+    }
+  }, [dispatch, location.pathname]);
+
   return (
     <>
       <CssBaseline />

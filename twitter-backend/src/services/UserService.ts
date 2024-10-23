@@ -39,6 +39,41 @@ class UserService {
     })) as IUser | null;
   }
 
+  public async getUser(currentuserId: string, username: string) {
+    return (await User.findOne({
+      where: {
+        username
+      },
+      attributes: {
+        include: [
+          // Subquery for counting followers
+          [
+            sequelize.literal(
+              `(SELECT COUNT(*) FROM "UserFollows" WHERE "UserFollows"."userId" = "User"."id")`
+            ),
+            "followersCount",
+          ],
+          // Subquery for counting followings
+          [
+            sequelize.literal(
+              `(SELECT COUNT(*) FROM "UserFollows" WHERE "UserFollows"."followerUserId" = "User"."id")`
+            ),
+            "followingsCount",
+          ],
+          [
+            sequelize.literal(
+              `(SELECT COUNT(*) FROM "Tweets" WHERE "Tweets"."userId" = "User"."id")`,
+            ),
+            'tweetsCount'
+          ]
+        ],
+      },
+      include: [
+        { model: UserProfile, as: "userProfile" },
+      ],
+    })) as IUser | null;
+  }
+
   public async createUser(
     userData: Omit<IUser, "id" | "createdAt" | "updatedAt">
   ): Promise<IUser> {

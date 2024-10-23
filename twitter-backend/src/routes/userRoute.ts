@@ -1,19 +1,23 @@
 import express, { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 
-
-import { isUserAuthenticated, notAuthenticated } from "../middleware/authMidddleware";
+import {
+  isUserAuthenticated,
+  notAuthenticated,
+} from "../middleware/authMidddleware";
 import { DisabledToken } from "../models";
 import { UserController } from "../controllers/UserController";
 
 const userRoute = express.Router();
 const userController = new UserController();
 
+userRoute.get("/:username", isUserAuthenticated, userController.getUser);
+
 userRoute.get("/", isUserAuthenticated, userController.getCurrentUser);
 
 userRoute.post("/signup", notAuthenticated, userController.createUser);
 
-userRoute.post("/signin", notAuthenticated , userController.signIn);
+userRoute.post("/signin", notAuthenticated, userController.signIn);
 
 userRoute.post(
   "/signout",
@@ -42,6 +46,6 @@ userRoute.post(
 
 userRoute.put("/", isUserAuthenticated, userController.updateUser);
 
-userRoute.delete("/",isUserAuthenticated, userController.deleteUser);
+userRoute.delete("/", isUserAuthenticated, userController.deleteUser);
 
 export { userRoute };

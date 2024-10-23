@@ -15,11 +15,13 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import PublicIcon from "@mui/icons-material/Public";
 import { useState } from "react";
 import CheckIcon from "@mui/icons-material/Check";
-import apiClient from "../../hooks/apiCaller";
 import { useNavigate } from "react-router-dom";
-import { IUser } from "../../types/interfaces";
+
+
+
 import { useAppSelector } from "../../hooks/customReduxHooks";
 import { RootState } from "../../store/store";
+import apiClient from "../../hooks/apiCaller";
 
 interface CreatePostProps {}
 
@@ -44,7 +46,7 @@ const CreatePost = (props: CreatePostProps) => {
   const maxTweetLength = 180;
   const navigate = useNavigate();
   const { user, loading, error } = useAppSelector(
-    (state: RootState) => state.user
+    (state: RootState) => state.currentUser
   );
 
   const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {

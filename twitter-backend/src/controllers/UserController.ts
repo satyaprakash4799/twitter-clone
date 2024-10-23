@@ -7,6 +7,8 @@ import {
   createUserValidator,
   signInValidator,
   updateUserValidator,
+  userIdValidator,
+  usernameValidator,
 } from "../middleware/validators/userValidator";
 import { StatusCodes } from "http-status-codes";
 import { IUser } from "../interface/userInterface";
@@ -23,16 +25,37 @@ class UserController {
     this.userProfileService = new UserProfileService();
     this.createUser = this.createUser.bind(this);
     this.signIn = this.signIn.bind(this);
-    this.getCurrentUser = this.getCurrentUser.bind(this);
+    this.getUser = this.getUser.bind(this);
     this.updateUser = this.updateUser.bind(this);
     this.deleteUser = this.deleteUser.bind(this);
+    this.getCurrentUser = this.getCurrentUser.bind(this);
+  }
+
+  public async getUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const currentUserId = req?.user?.id;
+      const { username } = req?.params;
+
+      const { error } = usernameValidator({username});
+
+      if (error ) { throw new ErrorHandler(StatusCodes.BAD_REQUEST, 'Validation Error', error?.details)}
+
+      const user= await this.userService.getUser(currentUserId, username);
+      return res.status(StatusCodes.OK).json({
+        user,
+      });
+    } catch (error) {
+      return next(error);
+    }
   }
 
   public async getCurrentUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const currentUser= await this.userService.getCurrentUser(req?.user?.id);
+      const currentUserId = req?.user?.id;
+      
+      const user= await this.userService.getCurrentUser(currentUserId);
       return res.status(StatusCodes.OK).json({
-        user: currentUser,
+        user,
       });
     } catch (error) {
       return next(error);

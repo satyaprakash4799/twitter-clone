@@ -1,7 +1,6 @@
 import { Box, Tab, Tabs } from "@mui/material";
 import { useState } from "react";
 import CreatePost from "../create-post/CreatePost";
-import { IUser } from "../../types/interfaces";
 
 interface MainProps {
 }
