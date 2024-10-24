@@ -10,24 +10,36 @@ import {
   Tooltip,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
-import apiClient from "../../hooks/apiCaller";
+
 import SideView from "../../components/sideview/Sideview";
-import { IUser } from "../../types/interfaces";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useAppSelector } from "../../hooks/customReduxHooks";
+import { IPage, IUser } from "../../types/interfaces";
+import { useAppDispatch, useAppSelector } from "../../hooks/customReduxHooks";
 import { RootState } from "../../store/store";
+import { fetchFollowers, fetchFollowings, fetchUser } from "../../store/slices/userSlice";
+
+const initPage: IPage = {
+  page: 1,
+  limit: 10
+};
 
 const Follow = () => {
-  const [followers, setFollowers] = useState<IUser[]>([]);
-  const [followings, setFollowings] = useState<IUser[]>([]);
-  const { user, loading, error } = useAppSelector(
-    (store: RootState) => store.user
-  );
+  const {
+    user,
+    loading,
+    error,
+    followers,
+    followersLoading,
+    followersError,
+    followings,
+    followingsLoading,
+    followingsError,
+  } = useAppSelector((store: RootState) => store.user);
 
   const navigate = useNavigate();
   const location = useLocation();
-  const tabPaths = [`followers`, `followings`];
+  const tabPaths = [`followings`, `followers`];
   const [activeTabValue, setActiveTabValue] = useState(() => {
     const paths = location.pathname.split("/");
     const currentTab = tabPaths.indexOf(paths[paths.length - 1]);
@@ -37,33 +49,26 @@ const Follow = () => {
       return 0;
     }
   });
+  const [followersPage, setFollowersPage ] = useState<IPage>(initPage);
+  const [ followingsPage, setFollowingsPage ] = useState<IPage>(initPage);
 
-  const getFollowers = async () => {
-    try {
-      const { data } = await apiClient.get(`/follow/${user?.id}/followers`);
-      console.log(data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  const getFollowings = async () => {
-    try {
-      const { data } = await apiClient.get(`/follow/${user?.id}/followings`);
-      console.log(data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const dispatch = useAppDispatch();
+  const params = useParams();
 
   useEffect(() => {
-    if (user) {
-      if (activeTabValue === 0) {
-        getFollowers();
-      } else {
-        getFollowings();
+    if (!user) {
+      const { username } = params;
+      if (username) {
+        dispatch(fetchUser(username));
       }
     }
-  }, [user]);
+    if (user) {
+      dispatch(fetchFollowings({
+        userId: user?.id as string,
+        iPage: followingsPage
+      }));
+    }
+  }, [dispatch, user]);
 
   useEffect(() => {
     const currentTab = tabPaths.indexOf(location.pathname);
@@ -76,9 +81,15 @@ const Follow = () => {
     setActiveTabValue(newValue);
     navigate(`/${user?.username}/${tabPaths[newValue]}`);
     if (newValue === 0) {
-      getFollowers();
+      dispatch(fetchFollowings({
+        userId: user?.id as string,
+        iPage: followingsPage
+      }));
     } else {
-      getFollowings();
+      dispatch(fetchFollowers({
+        userId: user?.id as string,
+        iPage: followersPage
+      }));
     }
   };
 
@@ -137,8 +148,8 @@ const Follow = () => {
               aria-label="tabs"
               variant="fullWidth"
             >
-              <Tab label="Followers" sx={{ textTransform: "none" }} />
               <Tab label="Followings" sx={{ textTransform: "none" }} />
+              <Tab label="Followers" sx={{ textTransform: "none" }} />
             </Tabs>
           </Box>
         </Box>

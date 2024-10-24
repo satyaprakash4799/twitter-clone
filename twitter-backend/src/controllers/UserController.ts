@@ -7,7 +7,6 @@ import {
   createUserValidator,
   signInValidator,
   updateUserValidator,
-  userIdValidator,
   usernameValidator,
 } from "../middleware/validators/userValidator";
 import { StatusCodes } from "http-status-codes";

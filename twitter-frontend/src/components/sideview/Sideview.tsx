@@ -17,7 +17,9 @@ const SideView = (props: SideViewProps) => {
   const { user, loading, error} = useSelector((state: RootState) => state.currentUser);
 
   useEffect(()=> {
-    dispatch(fetchCurrentUser());
+    if (!user){
+      dispatch(fetchCurrentUser());
+    }
   }, [dispatch])
   return (
     <>

@@ -22,6 +22,7 @@ import { RootState } from "../../store/store";
 import { useEffect } from "react";
 import { fetchUser } from "../../store/slices/userSlice";
 import { useAppDispatch } from "../../hooks/customReduxHooks";
+import Loader from "../../hooks/loader";
 
 const Profile = () => {
   const dispatch = useAppDispatch();
@@ -40,7 +41,7 @@ const Profile = () => {
 
   useEffect(() => {
     const { username } = params;
-    if (username) {
+    if (!user && username) {
       dispatch(fetchUser(username));
     }
   }, [dispatch, location.pathname]);
@@ -109,7 +110,7 @@ const Profile = () => {
               height: "200px",
             }}
           ></Box>
-          <Box sx={{ height: "100px", marginLeft: 1, marginTop: 1 }}>
+          <Box sx={{ height: "100px", margin:1 }}>
             <Box
               sx={{
                 display: "flex",
@@ -245,7 +246,7 @@ const Profile = () => {
                     borderBottom: "1px solid #000",
                   },
                 }}
-                onClick={() => navigate(`/${user?.username}/followers`)}
+                onClick={() => navigate(`/${user?.username}/followings`)}
               >
                 {loading ? (
                   <Skeleton
@@ -272,7 +273,7 @@ const Profile = () => {
                     borderBottom: "1px solid #000",
                   },
                 }}
-                onClick={() => navigate(`/${user?.username}/followings`)}
+                onClick={() => navigate(`/${user?.username}/followers`)}
               >
                 {loading ? (
                   <Skeleton
