@@ -6,11 +6,12 @@ import {
   UniqueConstraintError,
   ValidationError,
 } from "sequelize";
+import {IErrorResponse} from "../interface/ResponseInterface";
 
 const errorMiddleware = (
   err: any,
   req: Request,
-  res: Response,
+  res: Response<IErrorResponse>,
   next: NextFunction
 ) => {
   let statusCode = err?.statusCode || 500;

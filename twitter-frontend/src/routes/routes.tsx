@@ -3,8 +3,8 @@ import Root from "../views/root/Root";
 import SignIn from "../views/root/signIn/SignIn";
 import { NotAuthenticatedRoute, ProtectedRoute } from "../hooks/auth";
 import Home from "../views/home/Home";
-import Profile from "../components/profile/Profile";
-import Follow from "../components/follow/Follow";
+import Profile from "../views/profile/Profile";
+import Follow from "../views/follow/Follow";
 
 const router = createBrowserRouter([
   {

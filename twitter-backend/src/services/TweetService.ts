@@ -1,8 +1,10 @@
 import { Omit } from "lodash";
 import { IPage } from "../interface/paginationInterface";
 import { ITweet, ITweetLike } from "../interface/tweetInterface";
-import { Tweet } from "../models";
+import { Tweet, User, UserProfile } from "../models";
 import { TweetLike } from "../models/TweetModel";
+import { sequelize } from "../config/dbConnection";
+
 
 class TweetService {
   constructor() {
@@ -18,6 +20,22 @@ class TweetService {
     userId: string
   ): Promise<ITweet | undefined> {
     const tweet = await Tweet.findOne({
+      attributes: {
+        include: [
+          [
+            sequelize.literal(
+              `(SELECT COUNT(*) FROM "Tweets" WHERE "Tweets"."shareType" = null AND "Tweets"."parentId" = "Tweet"."id")`
+            ),
+            "replyCount",
+          ],
+          [
+            sequelize.literal(
+              `(SELECT COUNT(*) FROM "Tweets" WHERE "Tweets"."shareType" IS NOT NULL AND "Tweets"."parentId" = "Tweet"."id")`
+            ),
+            "shareCount",
+          ],
+        ],
+      },
       where: {
         userId,
         id: tweetId,
@@ -36,7 +54,43 @@ class TweetService {
     { offset, limit }: IPage
   ): Promise<[count: number, tweets: ITweet[]]> {
     const { count, rows } = await Tweet.findAndCountAll({
-      where: { userId },
+      where: { userId,
+        shareType : null as any
+      },
+      attributes: {
+        include: [
+          [
+            sequelize.literal(
+              `(SELECT COUNT(*) FROM "Tweets" WHERE "Tweets"."shareType" IS NULL AND "Tweets"."parentId" = "Tweet"."id")`
+            ),
+            "replyCount",
+          ],
+          [
+            sequelize.literal(
+              `(SELECT COUNT(*) FROM "Tweets" WHERE "Tweets"."shareType" IS NOT NULL AND "Tweets"."parentId" = "Tweet"."id")`
+            ),
+            "shareCount",
+          ],
+          [
+            sequelize.literal(
+              `(SELECT COUNT(*) FROM "TweetLikes" WHERE "TweetLikes"."tweetId" = "Tweet"."id")`
+            ),
+            "likesCount",
+          ],
+        ],
+      },
+      include: [
+        {
+          model: User,
+          as: "user",
+          include: [
+            {
+              model: UserProfile,
+              as: "userProfile",
+            },
+          ],
+        },
+      ],
       offset,
       limit,
       order: [["createdAt", "desc"]],

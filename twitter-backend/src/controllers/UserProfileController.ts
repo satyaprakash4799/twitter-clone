@@ -1,10 +1,15 @@
-import { Request, Response, NextFunction } from "express";
+import {Request, Response, NextFunction} from "express";
 
-import { UserProfileService } from "../services/UserProfileService";
-import { IUserProfile } from "../interface/userProfileInterface";
-import { createUserProfileValidator, profileImageTypeValidator, updateUserProfileValidator } from "../middleware/validators/userProfileValidator";
-import { ErrorHandler } from "../utils/ErrorHandler";
-import { StatusCodes } from "http-status-codes";
+import {UserProfileService} from "../services/UserProfileService";
+import {IUserProfile} from "../interface/userProfileInterface";
+import {
+  createUserProfileValidator,
+  profileImageTypeValidator,
+  updateUserProfileValidator
+} from "../middleware/validators/userProfileValidator";
+import {ErrorHandler} from "../utils/ErrorHandler";
+import {StatusCodes} from "http-status-codes";
+import {IUserProfileResponse} from "../interface/ResponseInterface";
 
 class UserProfileController {
   private userProfileService: UserProfileService;
@@ -19,7 +24,7 @@ class UserProfileController {
 
   public async createUserProfile(
     req: Request,
-    res: Response,
+    res: Response<IUserProfileResponse>,
     next: NextFunction
   ) {
     const userData = {
@@ -28,7 +33,7 @@ class UserProfileController {
       userImage: req?.body?.userImage
     } as IUserProfile;
 
-    const { error } = createUserProfileValidator(userData);
+    const {error} = createUserProfileValidator(userData);
 
     try {
       if (error) {
@@ -47,7 +52,7 @@ class UserProfileController {
     }
   }
 
-  public async getUserProfile(req: Request, res: Response, next: NextFunction) {
+  public async getUserProfile(req: Request, res: Response<IUserProfileResponse>, next: NextFunction) {
     try {
       const userProfile = await this.userProfileService.getUserProfile(
         req?.user?.id
@@ -60,46 +65,57 @@ class UserProfileController {
     }
   }
 
-  public async updateUserProfile(req: Request, res: Response, next: NextFunction) {
-    const { address, dateOfBirth } = req.body as IUserProfile;
+  public async updateUserProfile(req: Request, res: Response<IUserProfileResponse>, next: NextFunction) {
+    const {address, dateOfBirth} = req.body as IUserProfile;
 
     const files = req.files;
 
     const userFile = files && files.length ? files?.[0] : {} as Express.Multer.File;
 
-    try{
-      const { error:imageTypeError } = profileImageTypeValidator({mimetype: userFile.mimetype});
-      if (imageTypeError) { throw new ErrorHandler(StatusCodes.BAD_REQUEST, 'Validation Error', imageTypeError?.details)}
+    try {
+      const {error: imageTypeError} = profileImageTypeValidator({mimetype: userFile.mimetype});
+      if (imageTypeError) {
+        throw new ErrorHandler(StatusCodes.BAD_REQUEST, 'Validation Error', imageTypeError?.details)
+      }
 
-      const { error } = updateUserProfileValidator(req.body);
-      if (error) { throw new ErrorHandler(StatusCodes.BAD_REQUEST, 'Validation Error', error?.details)};
+      const {error} = updateUserProfileValidator(req.body);
+      if (error) {
+        throw new ErrorHandler(StatusCodes.BAD_REQUEST, 'Validation Error', error?.details)
+      }
+      ;
 
       const encodedImage = userFile?.buffer.toString('base64');
-      let userImage = encodedImage ? `data:${userFile.mimetype};base64, ${encodedImage}`:null;
+      let userImage = encodedImage ? `data:${userFile.mimetype};base64, ${encodedImage}` : null;
 
-      const [count, userProfile] = await this.userProfileService.updateUserProfile(req?.user?.id, {address, userImage, dateOfBirth });
+      const [count, userProfiles] = await this.userProfileService.updateUserProfile(req?.user?.id, {
+        address,
+        userImage,
+        dateOfBirth
+      });
 
-      if (count ==0){ return res.status(StatusCodes.OK).json({message: 'Nothing to update.'})}
+      if (count == 0) {
+        return res.status(StatusCodes.OK).json({message: 'Nothing to update.', userProfile: userProfiles[0]})
+      }
 
       return res.status(StatusCodes.OK).json({
         message: 'User profile updated successfully.',
-        userProfile: userProfile[0]
+        userProfile: userProfiles[0]
       })
-    }
-    catch(error) {
+    } catch (error) {
       return next(error);
     }
   }
 
   public async deleteUserProfile(
     req: Request,
-    res: Response,
+    res: Response<IUserProfileResponse>,
     next: NextFunction
   ) {
     try {
       await this.userProfileService.deleteUserProfile(req?.user?.id);
       return res.status(StatusCodes.NO_CONTENT).json({
-        message: 'User Profile deleted successfully.'
+        message: 'User Profile deleted successfully.',
+        userProfile: null
       })
     } catch (error) {
       return next(error);
@@ -107,4 +123,4 @@ class UserProfileController {
   }
 }
 
-export { UserProfileController };
+export {UserProfileController};

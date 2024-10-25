@@ -14,6 +14,7 @@ import { IUser } from "../interface/userInterface";
 import { ErrorHandler } from "../utils/ErrorHandler";
 import { UserProfileService } from "../services/UserProfileService";
 import { IUserProfile } from "../interface/userProfileInterface";
+import {ISignInResponse, IUserResponse} from "../interface/ResponseInterface";
 
 class UserController {
   private userService: UserService;
@@ -30,7 +31,7 @@ class UserController {
     this.getCurrentUser = this.getCurrentUser.bind(this);
   }
 
-  public async getUser(req: Request, res: Response, next: NextFunction) {
+  public async getUser(req: Request, res: Response<IUserResponse>, next: NextFunction) {
     try {
       const currentUserId = req?.user?.id;
       const { username } = req?.params;
@@ -48,7 +49,7 @@ class UserController {
     }
   }
 
-  public async getCurrentUser(req: Request, res: Response, next: NextFunction) {
+  public async getCurrentUser(req: Request, res: Response<IUserResponse>, next: NextFunction) {
     try {
       const currentUserId = req?.user?.id;
       
@@ -61,7 +62,7 @@ class UserController {
     }
   }
 
-  public async createUser(req: Request, res: Response, next: NextFunction) {
+  public async createUser(req: Request, res: Response<IUserResponse>, next: NextFunction) {
     const { firstName, lastName, username, password, phoneNumber, email } =
       req.body as IUser;
     const { error } = createUserValidator(req.body);
@@ -94,7 +95,7 @@ class UserController {
     }
   }
 
-  public async signIn(req: Request, res: Response, next: NextFunction) {
+  public async signIn(req: Request, res: Response<ISignInResponse>, next: NextFunction) {
     const { username, password } = req.body;
 
     const { error } = signInValidator(req.body);
@@ -134,7 +135,7 @@ class UserController {
     }
   }
 
-  public async updateUser(req: Request, res: Response, next: NextFunction) {
+  public async updateUser(req: Request, res: Response<IUserResponse>, next: NextFunction) {
     const { username, password, phoneNumber, email, firstName, lastName } =
       req.body as IUser;
 
@@ -156,6 +157,7 @@ class UserController {
       if (affectedCount === 0) {
         res.status(StatusCodes.OK).json({
           message: "Nothing to update.",
+          user: affectedUsers[0]
         });
       }
 
@@ -168,12 +170,13 @@ class UserController {
     }
   }
 
-  public async deleteUser(req: Request, res: Response, next: NextFunction) {
+  public async deleteUser(req: Request, res: Response<IUserResponse>, next: NextFunction) {
     try {
       // const deletedUserCount = await this.userService.deleteUser(req?.user?.id)
       // instead of deleting user, need to update another column like isDeleted
       return res.status(StatusCodes.NO_CONTENT).json({
         message: "User deleted successfully.",
+        user: null
       });
     } catch (error) {
       return next(error);

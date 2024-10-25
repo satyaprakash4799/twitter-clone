@@ -11,7 +11,7 @@ const tweetLikeController = new TweetLikeController()
 tweetRouter.use(isUserAuthenticated);
 
 tweetRouter.get('/:tweetId', tweetController.getTweetById);
-tweetRouter.get("/all", tweetController.getTweets);
+// tweetRouter.get("/all", tweetController.getTweets);
 tweetRouter.get("/all/:userId", tweetController.getTweetsByUser);
 tweetRouter.post("/", tweetController.createTweet);
 tweetRouter.put('/:tweetId', tweetController.updateTweet);
