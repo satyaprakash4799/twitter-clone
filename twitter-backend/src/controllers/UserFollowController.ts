@@ -1,15 +1,19 @@
-import { NextFunction, Request, Response } from "express";
+import {NextFunction, Request, Response} from "express";
 
-import { IUserFollow } from "../interface/userFollowInterface";
-import { UserFollowService } from "../services/UserFollowService";
+import {IUserFollow} from "../interface/userFollowInterface";
+import {UserFollowService} from "../services/UserFollowService";
 import {
   createUserFollowValidator,
   updateUserFollowValidator,
 } from "../middleware/validators/userFollowValidator";
-import { ErrorHandler } from "../utils/ErrorHandler";
-import { StatusCodes } from "http-status-codes";
-import { getOffset, getTotalPages } from "../utils/utils";
-import { userIdValidator } from "../middleware/validators/userValidator";
+import {ErrorHandler} from "../utils/ErrorHandler";
+import {StatusCodes} from "http-status-codes";
+import {getOffset, getTotalPages} from "../utils/utils";
+import {userIdValidator} from "../middleware/validators/userValidator";
+import {
+  IUserFollowPaginationResponse,
+  IUserFollowResponse
+} from "../interface/ResponseInterface";
 
 class UserFollowController {
   private readonly userFollowService: UserFollowService;
@@ -23,7 +27,7 @@ class UserFollowController {
     this.deleteFollower = this.deleteFollower.bind(this);
   }
 
-  public async addUserFollow(req: Request, res: Response, next: NextFunction) {
+  public async addUserFollow(req: Request, res: Response<IUserFollowResponse>, next: NextFunction) {
     const userData = {
       userId: req?.body?.targetUserId,
       disableFeed: req?.body?.disableFeed,
@@ -32,7 +36,7 @@ class UserFollowController {
     } as IUserFollow;
 
     try {
-      const { error } = createUserFollowValidator(userData);
+      const {error} = createUserFollowValidator(userData);
 
       if (error) {
         throw new ErrorHandler(
@@ -44,21 +48,21 @@ class UserFollowController {
       const userFollow = await this.userFollowService.addNewFollower(userData);
       return res.status(StatusCodes.CREATED).json({
         message: "Follower added successfully.",
-        userFollow,
+        user: userFollow,
       });
     } catch (error) {
       return next(error);
     }
   }
 
-  public async getFollowers(req: Request, res: Response, next: NextFunction) {
+  public async getFollowers(req: Request, res: Response<IUserFollowPaginationResponse>, next: NextFunction) {
     try {
-      const { userId } = req?.params;
+      const {userId} = req?.params;
       const page = parseInt(req?.query?.page as string) || 1,
         limit = parseInt(req?.query?.limit as string) || 10,
         offset = getOffset(page, limit);
 
-      const { error } = userIdValidator({ userId });
+      const {error} = userIdValidator({userId});
       if (error) {
         throw new ErrorHandler(
           StatusCodes.BAD_REQUEST,
@@ -76,20 +80,21 @@ class UserFollowController {
         totalPages,
         totalItems: count,
         users,
+        limit
       });
     } catch (error) {
       return next(error);
     }
   }
 
-  public async getFollowings(req: Request, res: Response, next: NextFunction) {
+  public async getFollowings(req: Request, res: Response<IUserFollowPaginationResponse>, next: NextFunction) {
     try {
-      const { userId } = req?.params;
+      const {userId} = req?.params;
       const page = parseInt(req?.query?.page as string) || 1,
         limit = parseInt(req?.query?.limit as string) || 10,
         offset = getOffset(page, limit);
 
-      const { error } = userIdValidator({ userId });
+      const {error} = userIdValidator({userId});
       if (error) {
         throw new ErrorHandler(
           StatusCodes.BAD_REQUEST,
@@ -99,7 +104,7 @@ class UserFollowController {
       }
       const [count, users] = await this.userFollowService.getFollowings(
         userId,
-        { limit, offset }
+        {limit, offset}
       );
       const totalPages = getTotalPages(count, limit);
       return res.status(StatusCodes.OK).json({
@@ -114,7 +119,7 @@ class UserFollowController {
     }
   }
 
-  public async updateFollower(req: Request, res: Response, next: NextFunction) {
+  public async updateFollower(req: Request, res: Response<IUserFollowResponse>, next: NextFunction) {
     const userData = {
       userId: req?.params?.targetUserId,
       followerUserId: req?.user?.id,
@@ -122,7 +127,7 @@ class UserFollowController {
       feedType: req?.body?.feedType,
     } as Omit<IUserFollow, "id" | "createdAt" | "updatedAt">;
 
-    const { error } = updateUserFollowValidator(userData);
+    const {error} = updateUserFollowValidator(userData);
 
     try {
       if (error) {
@@ -132,25 +137,27 @@ class UserFollowController {
           error?.details
         );
       }
-      const [count, updatedFollower] =
+      const [count, updatedFollowers] =
         await this.userFollowService.updateFollower(userData);
 
       if (count === 0) {
         return res.status(StatusCodes.OK).json({
           message: "Nothing to update",
+          user: updatedFollowers[0]
+
         });
       }
 
       return res.status(StatusCodes.OK).json({
         message: "User follower updated successfully",
-        following: updatedFollower[0],
+        user: updatedFollowers[0],
       });
     } catch (error) {
       return next(error);
     }
   }
 
-  public async deleteFollower(req: Request, res: Response, next: NextFunction) {
+  public async deleteFollower(req: Request, res: Response<IUserFollowResponse>, next: NextFunction) {
     const userData = {
       userId: req?.params?.targetUserId,
       followerUserId: req?.user?.id,
@@ -163,6 +170,7 @@ class UserFollowController {
       );
       return res.status(StatusCodes.NO_CONTENT).json({
         message: "User follower deleted successfully.",
+        user: null
       });
     } catch (error) {
       return next(error);
@@ -170,4 +178,4 @@ class UserFollowController {
   }
 }
 
-export { UserFollowController };
+export {UserFollowController};

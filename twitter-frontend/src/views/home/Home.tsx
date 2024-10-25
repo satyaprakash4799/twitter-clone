@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Box, Container, CssBaseline } from "@mui/material";
 
 import SideView from "../../components/sideview/Sideview";

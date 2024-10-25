@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 
 
 import { useEffect } from "react";
-import { fetchUser } from "../../store/slices/userSlice";
+import { fetchCurrentUser } from "../../store/slices/userSlice";
 import { useAppDispatch } from "../../hooks/customReduxHooks";
 import { RootState } from "../../store/store";
 
@@ -14,12 +14,12 @@ interface SideViewProps {
 }
 const SideView = (props: SideViewProps) => {
   const dispatch = useAppDispatch();
-  const { user, loading, error} = useSelector((state: RootState) => state.user);
-
-  console.log(user, loading, error)
+  const { user, loading, error} = useSelector((state: RootState) => state.currentUser);
 
   useEffect(()=> {
-    dispatch(fetchUser());
+    if (!user){
+      dispatch(fetchCurrentUser());
+    }
   }, [dispatch])
   return (
     <>

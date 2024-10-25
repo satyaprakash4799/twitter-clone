@@ -1,7 +1,6 @@
 import { Box, Tab, Tabs } from "@mui/material";
 import { useState } from "react";
 import CreatePost from "../create-post/CreatePost";
-import { IUser } from "../../types/interfaces";
 
 interface MainProps {
 }
@@ -46,8 +45,8 @@ const CustomTabPanel = (props: TabPanelProps) => {
     <div
       role="tabpanel"
       hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
+      id={`tabpanel-${index}`}
+      aria-labelledby={`tab-${index}`}
       {...other}
     >
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
