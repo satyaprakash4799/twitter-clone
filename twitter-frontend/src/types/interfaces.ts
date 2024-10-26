@@ -63,9 +63,9 @@ export interface ITweet {
   createdAt?: string;
   updatedAt?: string;
   user?: IUser;
-  replyCount: number;
-  shareCount: number;
-  likesCount: number;
+  replyCount?: number;
+  shareCount?: number;
+  likesCount?: number;
 }
 export interface ITweetLike {
   id?: string;

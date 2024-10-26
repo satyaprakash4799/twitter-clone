@@ -27,7 +27,7 @@ class UserService {
           ],
           [
             sequelize.literal(
-              `(SELECT COUNT(*) FROM "Tweets" WHERE "Tweets"."userId" = "User"."id")`,
+              `(SELECT COUNT(*) FROM "Tweets" WHERE "Tweets"."shareType" IS NULL AND "Tweets"."userId" = "User"."id")`,
             ),
             'tweetsCount'
           ]
