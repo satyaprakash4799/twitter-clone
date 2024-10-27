@@ -64,7 +64,7 @@ class TweetService {
 
   public async createTweet(createTweetData: ITweet) {
     const  newTweet = await Tweet.create(createTweetData);
-    return await this.getTweetById(newTweet.dataValues.id as string, newTweet.dataValues.userId);
+    return newTweet.get({plain: true});
   }
 
   public async getTweets(

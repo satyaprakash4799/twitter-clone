@@ -1,10 +1,25 @@
 import {
-  Avatar, Box, Button, CircularProgress, Divider, ListItemIcon, Menu, MenuItem, Stack, TextField, Typography,
+  Avatar,
+  Box,
+  Button,
+  CircularProgress,
+  Divider,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  MenuList,
+  Stack,
+  TextField,
+  Typography,
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import PublicIcon from "@mui/icons-material/Public";
 import {useState} from "react";
 import CheckIcon from "@mui/icons-material/Check";
+import PersonIcon from '@mui/icons-material/Person';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import {useNavigate} from "react-router-dom";
 
 
@@ -13,6 +28,7 @@ import {RootState} from "../../store/store";
 import {createTweet} from "../../store/slices/userSlice";
 import {IReplyType, ISharedToType, ITweet} from "../../types/interfaces";
 import {LoadingButton} from "@mui/lab";
+import {toCapitalize} from "../../utils/utils";
 
 interface CreatePostProps {
 }
@@ -21,6 +37,7 @@ interface CreatePostProps {
 const CreatePost = (props: CreatePostProps) => {
   const [menuEl, setMenuEl] = useState<null | HTMLElement>(null);
   const [showMenu, setShowMenu] = useState<boolean>(false);
+  const [showReplyMenu, setShowReplyMenu] = useState<boolean>(false);
   const [content, setContent] = useState<string>("");
   const [sharedToType, setSharedToType] = useState<ISharedToType>(ISharedToType.EVERYONE);
   const [replyType, setReplyType] = useState<IReplyType>(IReplyType.EVERYONE);
@@ -39,6 +56,18 @@ const CreatePost = (props: CreatePostProps) => {
     setMenuEl(event.currentTarget);
   };
 
+  const handleReplyButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setShowReplyMenu((prevValue) => {
+      return !prevValue;
+    });
+    setMenuEl(event.currentTarget);
+  };
+
+  const handleReplyMenuClose = () => {
+    setMenuEl(null);
+    setShowReplyMenu(false);
+  }
+
   const handleMenuClose = () => {
     setMenuEl(null);
     setShowMenu(false);
@@ -47,6 +76,22 @@ const CreatePost = (props: CreatePostProps) => {
     setContent(event.target.value);
   };
 
+  const handleReplyType = (value: string) => {
+    if (value === 'everyone'){
+      setReplyType(IReplyType.EVERYONE);
+    }
+    else if(value === 'accounts_you_follow'){
+      setReplyType(IReplyType.ACCOUNTS_YOU_FOLLOW)
+    }
+    else if(value === 'verified_accounts'){
+      setReplyType(IReplyType.VERIFIED_ACCOUNTS)
+    }
+    else if(value === 'only_account_you_mentioned'){
+      setReplyType(IReplyType.ONLY_ACCOUNTS_YOU_MENTIONED)
+    }
+    handleReplyMenuClose();
+
+  }
   const handleCreatePost = async () => {
     const createPostData: ITweet = {
       userId: user?.id as string, content, sharedToType, replyType,
@@ -143,12 +188,69 @@ const CreatePost = (props: CreatePostProps) => {
             marginTop: 2,
             marginBottom: 2,
             justifyContent: "flex-start",
-            width: "170px",
           }}
+          onClick={handleReplyButtonClick}
           startIcon={<PublicIcon sx={{color: "rgb(29, 155, 240)"}}/>}
         >
-          Everyone can reply
+          {toCapitalize(replyType)} can reply
         </Button>
+        <Menu
+          open={showReplyMenu}
+          anchorEl={menuEl}
+          sx={{
+            "& .MuiPaper-root": {
+              borderRadius: "10px",
+              width: '350px',
+            },
+          }}
+          onClose={handleReplyMenuClose}
+        >
+          <MenuList>
+            <Box typography={'h6'} sx={{m: 1}}>
+              Who can reply?
+            </Box>
+            <Box typography={"body2"} sx={{m: 1}}>
+              Choose who can reply to this post. Anyone mentioned can always reply.
+            </Box>
+            <MenuItem sx={{gap: 1}} onClick={()=> handleReplyType('everyone')}>
+              <ListItemIcon sx={{color: '#1976d2'}}>
+                <PublicIcon fontSize={"large"}/>
+              </ListItemIcon>
+              <ListItemText>Everyone</ListItemText>
+              { replyType === 'everyone' && <ListItemIcon sx={{color: '#1976d2'}}>
+                <CheckIcon/>
+              </ListItemIcon>}
+
+            </MenuItem>
+            <MenuItem sx={{gap: 1}} onClick={()=> handleReplyType('accounts_you_follow')}>
+              <ListItemIcon sx={{color: '#1976d2'}}>
+                <PersonIcon fontSize={"large"}/>
+              </ListItemIcon>
+              <ListItemText>Accounts you follow</ListItemText>
+              { replyType === 'accounts_you_follow' && <ListItemIcon sx={{color: '#1976d2'}}>
+                <CheckIcon/>
+              </ListItemIcon>}
+            </MenuItem>
+            <MenuItem sx={{gap: 1}} onClick={()=> handleReplyType('verified_accounts')}>
+              <ListItemIcon sx={{color: '#1976d2'}}>
+                <CheckCircleIcon fontSize={"large"}/>
+              </ListItemIcon>
+              <ListItemText>Verified accounts</ListItemText>
+              { replyType === 'verified_accounts'  && <ListItemIcon sx={{color: '#1976d2'}}>
+                <CheckIcon/>
+              </ListItemIcon>}
+            </MenuItem>
+            <MenuItem sx={{gap: 1}} onClick={()=> handleReplyType('only_account_you_mentioned')}>
+              <ListItemIcon sx={{color: '#1976d2'}}>
+                <AlternateEmailIcon fontSize={"large"}/>
+              </ListItemIcon>
+              <ListItemText>Only accounts you mention</ListItemText>
+              { replyType === 'only_account_you_mentioned' && <ListItemIcon sx={{color: '#1976d2'}}>
+                <CheckIcon/>
+              </ListItemIcon>}
+            </MenuItem>
+          </MenuList>
+        </Menu>
         <Divider/>
         <Box sx={{marginTop: 1, marginBottom: 1}}>
           <Stack
@@ -175,17 +277,17 @@ const CreatePost = (props: CreatePostProps) => {
               />
             </Box>)}
             <LoadingButton loading={loadingCreateTweet} loadingPosition={'center'}
-               sx={{
-                 width: "20px",
-                 borderRadius: "10px",
-                 backgroundColor: "rgb(29, 155, 240)",
-                 color: "#fff",
-                 "&.Mui-disabled": {
-                   backgroundColor: "rgb(29, 155, 240)", opacity: "0.5", color: "#fff",
-                 },
-               }}
-               disabled={!content.length}
-               onClick={handleCreatePost}>Post</LoadingButton>
+                           sx={{
+                             width: "20px",
+                             borderRadius: "10px",
+                             backgroundColor: "rgb(29, 155, 240)",
+                             color: "#fff",
+                             "&.Mui-disabled": {
+                               backgroundColor: "rgb(29, 155, 240)", opacity: "0.5", color: "#fff",
+                             },
+                           }}
+                           disabled={!content.length}
+                           onClick={handleCreatePost}>Post</LoadingButton>
           </Stack>
         </Box>
       </Box>

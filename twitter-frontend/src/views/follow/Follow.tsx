@@ -1,30 +1,15 @@
-import { useEffect, useState } from "react";
-import {
-  Box,
-  Container,
-  CssBaseline,
-  IconButton,
-  List,
-  ListItem,
-  Skeleton,
-  Tab,
-  Tabs,
-  Tooltip,
-} from "@mui/material";
+import {useEffect, useState} from "react";
+import {Box, Container, CssBaseline, IconButton, List, ListItem, Skeleton, Tab, Tabs, Tooltip,} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 
 import SideView from "../../components/sideview/Sideview";
-import { IPage, IUser } from "../../types/interfaces";
-import { useAppDispatch, useAppSelector } from "../../hooks/customReduxHooks";
-import { RootState } from "../../store/store";
-import {
-  fetchFollowers,
-  fetchFollowings,
-  fetchUser,
-} from "../../store/slices/userSlice";
+import {IPage} from "../../types/interfaces";
+import {useAppDispatch, useAppSelector} from "../../hooks/customReduxHooks";
+import {RootState} from "../../store/store";
+import {fetchFollowers, fetchFollowings, fetchUser,} from "../../store/slices/userSlice";
 import InfiniteScroll from "react-infinite-scroller";
-import Loader from "../../hooks/loader";
+import Loader, {LoaderTypeEnum} from "../../hooks/loader";
 
 const initPage: IPage = {
   page: 1,
@@ -162,7 +147,7 @@ const Follow = () => {
           <TabPanel index={0} value={activeTabValue}>
             <List>
               <InfiniteScroll pageStart={0} loadMore={()=> {}} hasMore={true}
-              loader={<Loader type="circular"/>}
+              loader={<Loader type={LoaderTypeEnum.linear}/>}
               >
                 {Array.from({ length: 10 }).map((val, index) => {
                 return <ListItem key={index}>

@@ -126,6 +126,9 @@ const userSlicer = createSlice({
       state.followings = initFollowState;
     }, defaultUserState(state) {
       state = initialState;
+    },
+    clearTweets(state){
+      state.tweets = initTweetsState
     }
   }, extraReducers: (builder) => {
     builder
@@ -211,6 +214,6 @@ const userSlicer = createSlice({
       });
   },
 });
-export const {clearFollowers, clearFollowings, defaultUserState} = userSlicer.actions;
+export const {clearFollowers, clearFollowings, defaultUserState, clearTweets} = userSlicer.actions;
 export default currentUserSlicer.reducer;
 export const userReducer = userSlicer.reducer;
