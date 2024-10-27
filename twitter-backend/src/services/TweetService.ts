@@ -34,8 +34,26 @@ class TweetService {
             ),
             "shareCount",
           ],
+          [
+            sequelize.literal(
+              `(SELECT COUNT(*) FROM "TweetLikes" WHERE "TweetLikes"."tweetId" = "Tweet"."id")`
+            ),
+            "likesCount",
+          ],
         ],
       },
+      include: [
+        {
+          model: User,
+          as: "user",
+          include: [
+            {
+              model: UserProfile,
+              as: "userProfile",
+            },
+          ],
+        },
+      ],
       where: {
         userId,
         id: tweetId,
@@ -45,8 +63,8 @@ class TweetService {
   }
 
   public async createTweet(createTweetData: ITweet) {
-    const newTweet = await Tweet.create(createTweetData);
-    return newTweet.get({ plain: true });
+    const  newTweet = await Tweet.create(createTweetData);
+    return newTweet.get({plain: true});
   }
 
   public async getTweets(

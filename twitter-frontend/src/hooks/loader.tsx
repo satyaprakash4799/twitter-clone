@@ -1,18 +1,18 @@
 import { Box, CircularProgress, LinearProgress } from "@mui/material";
 
-enum LoaderTypeEnum {
+export enum LoaderTypeEnum {
   linear = "linear",
   circular = "circular",
 }
 interface LoaderProps {
-  type: string;
+  type: LoaderTypeEnum;
 }
 
 const Loader = (props: LoaderProps) => {
   const { type = "circular" } = props;
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent:'center' }}>
       {type === "linear" && <LinearProgress color='info'/>}
       {type === "circular" && <CircularProgress color="info" />}
     </Box>
