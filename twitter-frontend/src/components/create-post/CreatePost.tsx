@@ -192,7 +192,7 @@ const CreatePost = (props: CreatePostProps) => {
           onClick={handleReplyButtonClick}
           startIcon={<PublicIcon sx={{color: "rgb(29, 155, 240)"}}/>}
         >
-          {toCapitalize(replyType)} can reply
+          {toCapitalize(replyType.split('_').join(' '))} can reply
         </Button>
         <Menu
           open={showReplyMenu}

@@ -10,7 +10,6 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  MenuList,
   Skeleton,
   Tooltip,
   Typography,
@@ -80,16 +79,18 @@ const Profile = () => {
   }, [tweets]);
 
   useEffect(() => {
-    if (user) getTweets();
+    if (user) {
+      document.title = `${user.firstName} ${user.lastName}`;
+      getTweets(user)
+    }
+
     return () => {
       dispatch(clearTweets());
     }
   }, [dispatch, user]);
 
-  const getTweets = () => {
-    if (user) {
-      dispatch(fetchTweets({userId: user?.id as string, iPage: tweetPage}));
-    }
+  const getTweets = (user: IUser) => {
+    dispatch(fetchTweets({userId: user?.id as string, iPage: tweetPage}));
   }
 
   return (
@@ -144,7 +145,7 @@ const Profile = () => {
           ></Box>
           <Box sx={{height: '75px', display: 'flex'}}>
             <Box sx={{position: 'relative'}}>
-              <Box sx={{position: 'absolute', top: '-100%',left: '20px'}}>
+              <Box sx={{position: 'absolute', top: '-100%', left: '20px'}}>
                 <Avatar sx={{height: 135, width: 135}} src={user?.userProfile?.userImage as string}/>
               </Box>
             </Box>
@@ -279,20 +280,23 @@ const Profile = () => {
               </Box>
             </Box>
           </Box>
-          <Box sx={{padding: 2}}>
+          <Box sx={{padding: 0}}>
             <List>
               <InfiniteScroll
                 pageStart={1}
                 initialLoad={false}
-                loadMore={getTweets}
+                loadMore={() => user && getTweets(user)}
                 hasMore={(tweets?.currentPage == 0) || (tweets?.currentPage !== tweets?.totalPages)}
                 loader={<Loader type={LoaderTypeEnum.circular}/>}
               >
-                {tweets.tweets.map((tweet) => {
-                  return <TweetItem key={tweet.id}
-                                    tweet={tweet}
-                                    currentUser={currentUser}
-                                    dispatch={dispatch}/>;
+                {tweets?.tweets.map((tweet, index) => {
+                  return (
+                    <TweetItem
+                      key={tweet.id}
+                      tweet={tweet}
+                      currentUser={currentUser}
+                      dispatch={dispatch}/>
+                  );
                 })
                 }
               </InfiniteScroll>
@@ -331,104 +335,116 @@ const TweetItem = (props: TweetItemPros) => {
     handleMenuClose();
     dispatch(deleteTweet(tweetId));
   }
-  return (<Box
-    sx={{
-      display: "flex", flexDirection: "row", padding: 2, gap: 2, '&:hover': {backgroundColor: 'rgba(0,0,0,0.03)'}
-    }}
-  >
-    <Box>
-      <Avatar src={tweet?.user?.userProfile?.userImage as string}/>
-    </Box>
-    <Box sx={{display: "flex", flexDirection: "column", flex: '0 0 50%'}}>
-      <Box sx={{display: "flex", flexDirection: "row", gap: 1, alignItems: 'center'}}>
-        <Box typography={"span"} sx={{fontWeight: "bold"}}>
-          {tweet.user?.firstName} {tweet.user?.lastName}
-        </Box>
-        <Box typography={"span"}>@{tweet?.user?.username}</Box>
-        <Box typography={"span"}>
-          <Tooltip title={moment(tweet?.createdAt).format("hh:mm:ss a MMM DD, YYYY")} arrow>
-            <span>{moment(tweet.createdAt).format("MMM DD")}</span>
-          </Tooltip>
-        </Box>
-        <Box sx={{display: 'flex', marginLeft: 'auto', '&:hover': {color: 'rgb(0, 186, 124)'}}}>
-          <IconButton color={'inherit'} onClick={handleButtonClick}><MoreHorizIcon/></IconButton>
-          <Menu
-            open={showMenu}
-            anchorEl={menuEl}
-            sx={{
-              "& .MuiPaper-root": {
-                borderRadius: "10px",
-              },
-            }}
-            onClose={handleMenuClose}
-          >
-            <MenuList>
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "row",
+        padding: 2,
+        gap: 2,
+        borderBottom: '1px solid rgb(239, 243, 244)',
+        '&:hover': {backgroundColor: 'rgba(0,0,0,0.05)'}
+      }}
+    >
+      <Box>
+        <Avatar src={tweet?.user?.userProfile?.userImage as string}/>
+      </Box>
+      <Box sx={{display: "flex", flexDirection: "column", flex: '0 0 50%'}}>
+        <Box sx={{display: "flex", flexDirection: "row", gap: 1, alignItems: 'center'}}>
+          <Box typography={"span"} sx={{fontWeight: "bold"}}>
+            {tweet.user?.firstName} {tweet.user?.lastName}
+          </Box>
+          <Box typography={"span"}>@{tweet?.user?.username}</Box>
+          <Box typography={"span"}>
+            <Tooltip title={moment(tweet?.createdAt).format("hh:mm:ss a MMM DD, YYYY")} arrow>
+              <span>{moment(tweet.createdAt).format("MMM DD")}</span>
+            </Tooltip>
+          </Box>
+          <Box sx={{display: 'flex', marginLeft: 'auto', '&:hover': {color: 'rgb(0, 186, 124)'}}}>
+            <IconButton color={'inherit'} onClick={handleButtonClick}><MoreHorizIcon/></IconButton>
+            <Menu
+              open={showMenu}
+              anchorEl={menuEl}
+              sx={{
+                "& .MuiPaper-root": {
+                  borderRadius: "10px",
+                },
+              }}
+              onClose={handleMenuClose}
+            >
               {(currentUser?.id === tweet.user?.id) && <MenuItem onClick={() => handleDeleteTweet(tweet?.id as string)}>
-                  <ListItemIcon>
-                      <DeleteOutlineIcon sx={{color: 'rgb(244, 33, 46)'}}/>
-                  </ListItemIcon>
-                  <ListItemText sx={{'color': 'rgb(244, 33, 46)'}}>Delete</ListItemText>
+                <ListItemIcon>
+                  <DeleteOutlineIcon sx={{color: 'rgb(244, 33, 46)'}}/>
+                </ListItemIcon>
+                <ListItemText sx={{'color': 'rgb(244, 33, 46)'}}>Delete</ListItemText>
 
               </MenuItem>
               }
               {(currentUser?.id === tweet.user?.id) && <MenuItem>
-                  <ListItemIcon>
-                      <PushPinOutlinedIcon/>
-                  </ListItemIcon>
-                  <ListItemText>Pin to your profile</ListItemText>
+                <ListItemIcon>
+                  <PushPinOutlinedIcon/>
+                </ListItemIcon>
+                <ListItemText>Pin to your profile</ListItemText>
               </MenuItem>}
               {(currentUser?.id === tweet.user?.id) && <MenuItem>
-                  <ListItemIcon>
-                      < ChatBubbleOutlineIcon/>
-                  </ListItemIcon>
-                  <ListItemText>Change who can reply</ListItemText>
+                <ListItemIcon>
+                  < ChatBubbleOutlineIcon/>
+                </ListItemIcon>
+                <ListItemText>Change who can reply</ListItemText>
               </MenuItem>}
-            </MenuList>
-          </Menu>
+            </Menu>
+          </Box>
         </Box>
-      </Box>
-      <Box typography={'span'} sx={{marginTop: 1, marginBottom: 1}}>
-        {tweet.content}
-      </Box>
+        <Box typography={'span'} sx={{marginTop: 1, marginBottom: 1}}>
+          {tweet.content}
+        </Box>
 
-      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-        <Tooltip title="Reply" arrow>
-          <Box sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            gap: 1,
-            cursor: 'pointer',
-            alignItems: 'center',
-            '&:hover': {color: 'rgb(29,155,240)'},
-          }}>
-            <IconButton color={'inherit'}> < ChatBubbleOutlineIcon/> </IconButton>
-            <Box typography={"body1"}>{tweet?.replyCount}</Box>
-          </Box>
-        </Tooltip>
-        <Tooltip title={"Repost"}>
-          <Box sx={{
-            display: 'flex', flexDirection: 'row', gap: 1, cursor: 'pointer', alignItems: 'center', '&:hover': {
-              color: 'rgb(0, 186, 124)'
-            }
-          }}>
-            < IconButton color={'inherit'}> < AutorenewIcon/></IconButton>
-            <Box typography={"body1"}>{tweet?.shareCount}</Box>
-          </Box>
-        </Tooltip>
-        <Tooltip title={"Like"}>
-          <Box sx={{
-            display: 'flex', flexDirection: 'row', gap: 1, cursor: 'pointer', alignItems: 'center', '&:hover': {
-              color: 'rgb(249,24,128)'
-            }
-          }}>
-            <IconButton color={'inherit'}><FavoriteBorderIcon/></IconButton>
-            <Box typography={"body1"}>{tweet?.likesCount}</Box>
-          </Box>
-        </Tooltip>
-      </Box>
+        <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+          <Tooltip title="Reply" arrow>
+            <Box sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              // gap: 1,
+              cursor: 'pointer',
+              alignItems: 'center',
+              '&:hover': {color: 'rgb(29,155,240)'},
+            }}>
+              <IconButton color={'inherit'}> < ChatBubbleOutlineIcon fontSize={'small'}/> </IconButton>
+              <Box typography={"p"}>{tweet?.replyCount}</Box>
+            </Box>
+          </Tooltip>
+          <Tooltip title={"Repost"}>
+            <Box sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              cursor: 'pointer',
+              alignItems: 'center',
+              '&:hover': {
+                color: 'rgb(0, 186, 124)'
+              }
+            }}>
+              < IconButton color={'inherit'}> < AutorenewIcon fontSize={'small'}/></IconButton>
+              <Box typography={"body1"}>{tweet?.shareCount}</Box>
+            </Box>
+          </Tooltip>
+          <Tooltip title={"Like"}>
+            <Box sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              cursor: 'pointer',
+              alignItems: 'center',
+              '&:hover': {
+                color: 'rgb(249,24,128)'
+              }
+            }}>
+              <IconButton color={'inherit'}><FavoriteBorderIcon fontSize={'small'}/></IconButton>
+              <Box typography={"body1"}>{tweet?.likesCount}</Box>
+            </Box>
+          </Tooltip>
+        </Box>
 
-    </Box>
-  </Box>);
+      </Box>
+    </Box>);
 };
 
 export default Profile;

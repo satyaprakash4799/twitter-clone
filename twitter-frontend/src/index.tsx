@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { RouterProvider } from "react-router-dom";
-import { Provider } from "react-redux";
+import {RouterProvider} from "react-router-dom";
+import {Provider} from "react-redux";
 
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
@@ -11,7 +11,9 @@ import "@fontsource/roboto/700.css";
 import reportWebVitals from "./reportWebVitals";
 import router from "./routes/routes";
 import store from "./store/store";
+import {SnackbarProvider} from "./components/common/SnackbarStack";
 import "./index.css";
+
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -20,7 +22,9 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <RouterProvider router={router} />
+      <SnackbarProvider>
+        <RouterProvider router={router}/>
+      </SnackbarProvider>
     </Provider>
   </React.StrictMode>
 );

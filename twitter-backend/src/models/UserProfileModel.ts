@@ -1,10 +1,12 @@
-import { DataTypes, Model } from "sequelize";
+import {DataTypes, Model} from "sequelize";
 
-import { sequelize } from "../config/dbConnection";
-import { User } from "./UserModel";
-import { IUserProfile } from "../interface/userProfileInterface";
+import {sequelize} from "../config/dbConnection";
+import {User} from "./UserModel";
+import {IUserProfile} from "../interface/userProfileInterface";
+import {setDefaultYear} from "../utils/utils";
 
-class UserProfile extends Model<IUserProfile> {}
+class UserProfile extends Model<IUserProfile> {
+}
 
 UserProfile.init(
   {
@@ -31,7 +33,8 @@ UserProfile.init(
     },
     dateOfBirth: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
+      defaultValue: setDefaultYear(20),
     }
   },
   {
@@ -39,4 +42,4 @@ UserProfile.init(
   }
 );
 
-export { UserProfile };
+export {UserProfile};

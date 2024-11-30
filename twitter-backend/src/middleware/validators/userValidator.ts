@@ -42,7 +42,7 @@ const createUserValidatorSchema = Joi.object({
     .max(10 ** 10 - 1)
     .required()
     .messages({
-      "number.base": "Phone Number should be a string.",
+      "number.base": "Phone Number should a valid number.",
       "number.empty": `Phone Number can't be empty.`,
       "number.min": `Phone Number must be of 10 characters long.`,
       "number.max": "Phone Number must be of 10 characters long",
@@ -140,15 +140,15 @@ const usernameValidatorSchema = Joi.object({
 });
 
 const createUserValidator = (userData: any) => {
-  return createUserValidatorSchema.validate(userData, { abortEarly: true });
+  return createUserValidatorSchema.validate(userData, {abortEarly: true});
 };
 
 const signInValidator = (userData: any) => {
-  return signInValidatorSchema.validate(userData, { abortEarly: true });
+  return signInValidatorSchema.validate(userData, {abortEarly: true});
 };
 
 const updateUserValidator = (userData: any) => {
-  return updateUserValidatorSchema.validate(userData, { abortEarly: true });
+  return updateUserValidatorSchema.validate(userData, {abortEarly: true});
 };
 
 const userIdValidator = (userData: any) => {
@@ -157,6 +157,6 @@ const userIdValidator = (userData: any) => {
 
 const usernameValidator = (userData: any) => {
   return usernameValidatorSchema.validate(userData);
-} 
+}
 
-export { createUserValidator, signInValidator, updateUserValidator, userIdValidator, usernameValidator };
+export {createUserValidator, signInValidator, updateUserValidator, userIdValidator, usernameValidator};

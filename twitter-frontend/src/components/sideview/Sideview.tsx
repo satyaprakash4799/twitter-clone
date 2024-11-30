@@ -1,23 +1,26 @@
-import { Avatar, Box, IconButton, Tooltip } from "@mui/material";
+import {Avatar, Box, IconButton, Tooltip} from "@mui/material";
 import XIcon from "@mui/icons-material/X";
 import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
-import { useSelector } from "react-redux";
+import {useSelector} from "react-redux";
 
 
-import { useEffect } from "react";
-import { fetchCurrentUser } from "../../store/slices/userSlice";
-import { useAppDispatch } from "../../hooks/customReduxHooks";
-import { RootState } from "../../store/store";
+import {useEffect} from "react";
+import {fetchCurrentUser} from "../../store/slices/userSlice";
+import {useAppDispatch} from "../../hooks/customReduxHooks";
+import {RootState} from "../../store/store";
+import {useNavigate} from "react-router-dom";
 
 interface SideViewProps {
 }
+
 const SideView = (props: SideViewProps) => {
   const dispatch = useAppDispatch();
-  const { user, loading, error} = useSelector((state: RootState) => state.currentUser);
+  const {user, loading, error} = useSelector((state: RootState) => state.currentUser);
+  const navigate = useNavigate()
 
-  useEffect(()=> {
-    if (!user){
+  useEffect(() => {
+    if (!user) {
       dispatch(fetchCurrentUser());
     }
   }, [dispatch])
@@ -33,25 +36,25 @@ const SideView = (props: SideViewProps) => {
           borderRight: "0.3px solid #80808021",
         }}
       >
-        <IconButton>
+        <IconButton onClick={() => navigate('/home')}>
           {" "}
-          <XIcon fontSize="large" sx={{ color: "#000" }} />
+          <XIcon fontSize="large" sx={{color: "#000"}}/>
         </IconButton>
         <Tooltip title="Home">
-          <IconButton>
+          <IconButton onClick={() => navigate('/home')}>
             {" "}
-            <HomeIcon fontSize="medium" sx={{ color: "#000" }} />
+            <HomeIcon fontSize="medium" sx={{color: "#000"}}/>
           </IconButton>
         </Tooltip>
         <Tooltip title="Explore">
           <IconButton>
             {" "}
-            <SearchIcon fontSize="medium" sx={{ color: "#000" }} />
+            <SearchIcon fontSize="medium" sx={{color: "#000"}}/>
           </IconButton>
         </Tooltip>
         <Tooltip title="Accounts">
           <Avatar
-            sx={{ position: "absolute", bottom: "20px" }}
+            sx={{position: "absolute", bottom: "20px"}}
             src={user?.userProfile?.userImage as string}
           ></Avatar>
         </Tooltip>

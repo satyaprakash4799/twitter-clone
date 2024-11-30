@@ -27,7 +27,7 @@ const port = process.env.PORT || 4000;
 connectDB();
 
 // adding the test query script
-test
+// test
 
 app.use(cors());
 
@@ -50,7 +50,8 @@ app.use(errorMiddleware);
 
 app.use('*', (req: Request, res: Response) => {
   res.status(StatusCodes.BAD_REQUEST).json({
-    message:'Invalid api request.'
+    message:'Invalid api request.',
+    details: 'null'
   })
 });
 
