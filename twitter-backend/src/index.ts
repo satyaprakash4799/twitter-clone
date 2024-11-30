@@ -1,23 +1,16 @@
 import dotenv from 'dotenv';
-
-dotenv.config();
-
-
-import express, { Request, Response} from 'express';
+import express, {Request, Response} from 'express';
 import bodyParser from 'body-parser';
 import multer from 'multer';
 import cors from 'cors';
 
-import { connectDB } from './config/dbConnection';
-import { StatusCodes } from 'http-status-codes';
-import { errorMiddleware } from './middleware/errorMiddleware';
-import { router } from './routes';
-import * as test from './test/test';
+import {connectDB} from './config/dbConnection';
+import {StatusCodes} from 'http-status-codes';
+import {errorMiddleware} from './middleware/errorMiddleware';
+import {router} from './routes';
+// import * as test from './test/test';
 
-
-import * as _Models from './models';
-
-
+dotenv.config();
 
 
 const app = express();
@@ -27,7 +20,7 @@ const port = process.env.PORT || 4000;
 connectDB();
 
 // adding the test query script
-test
+// test
 
 app.use(cors());
 
@@ -48,9 +41,10 @@ app.use(router);
 // error middleware
 app.use(errorMiddleware);
 
-app.use('*', (req: Request, res: Response) => {
+app.use('*', (_req: Request, res: Response) => {
   res.status(StatusCodes.BAD_REQUEST).json({
-    message:'Invalid api request.'
+    message: 'Invalid api request.',
+    details: 'null'
   })
 });
 

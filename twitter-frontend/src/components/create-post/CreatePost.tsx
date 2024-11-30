@@ -43,7 +43,7 @@ const CreatePost = (props: CreatePostProps) => {
   const [replyType, setReplyType] = useState<IReplyType>(IReplyType.EVERYONE);
   const maxTweetLength = 180;
   const navigate = useNavigate();
-  const {user, loading, error} = useAppSelector((state: RootState) => state.currentUser);
+  const {user} = useAppSelector((state: RootState) => state.currentUser);
 
   const {loadingCreateTweet} = useAppSelector((state: RootState) => state.user)
 
@@ -77,16 +77,13 @@ const CreatePost = (props: CreatePostProps) => {
   };
 
   const handleReplyType = (value: string) => {
-    if (value === 'everyone'){
+    if (value === 'everyone') {
       setReplyType(IReplyType.EVERYONE);
-    }
-    else if(value === 'accounts_you_follow'){
+    } else if (value === 'accounts_you_follow') {
       setReplyType(IReplyType.ACCOUNTS_YOU_FOLLOW)
-    }
-    else if(value === 'verified_accounts'){
+    } else if (value === 'verified_accounts') {
       setReplyType(IReplyType.VERIFIED_ACCOUNTS)
-    }
-    else if(value === 'only_account_you_mentioned'){
+    } else if (value === 'only_account_you_mentioned') {
       setReplyType(IReplyType.ONLY_ACCOUNTS_YOU_MENTIONED)
     }
     handleReplyMenuClose();
@@ -192,7 +189,7 @@ const CreatePost = (props: CreatePostProps) => {
           onClick={handleReplyButtonClick}
           startIcon={<PublicIcon sx={{color: "rgb(29, 155, 240)"}}/>}
         >
-          {toCapitalize(replyType)} can reply
+          {toCapitalize(replyType.split('_').join(' '))} can reply
         </Button>
         <Menu
           open={showReplyMenu}
@@ -212,40 +209,40 @@ const CreatePost = (props: CreatePostProps) => {
             <Box typography={"body2"} sx={{m: 1}}>
               Choose who can reply to this post. Anyone mentioned can always reply.
             </Box>
-            <MenuItem sx={{gap: 1}} onClick={()=> handleReplyType('everyone')}>
+            <MenuItem sx={{gap: 1}} onClick={() => handleReplyType('everyone')}>
               <ListItemIcon sx={{color: '#1976d2'}}>
                 <PublicIcon fontSize={"large"}/>
               </ListItemIcon>
               <ListItemText>Everyone</ListItemText>
-              { replyType === 'everyone' && <ListItemIcon sx={{color: '#1976d2'}}>
+              {replyType === 'everyone' && <ListItemIcon sx={{color: '#1976d2'}}>
                 <CheckIcon/>
               </ListItemIcon>}
 
             </MenuItem>
-            <MenuItem sx={{gap: 1}} onClick={()=> handleReplyType('accounts_you_follow')}>
+            <MenuItem sx={{gap: 1}} onClick={() => handleReplyType('accounts_you_follow')}>
               <ListItemIcon sx={{color: '#1976d2'}}>
                 <PersonIcon fontSize={"large"}/>
               </ListItemIcon>
               <ListItemText>Accounts you follow</ListItemText>
-              { replyType === 'accounts_you_follow' && <ListItemIcon sx={{color: '#1976d2'}}>
+              {replyType === 'accounts_you_follow' && <ListItemIcon sx={{color: '#1976d2'}}>
                 <CheckIcon/>
               </ListItemIcon>}
             </MenuItem>
-            <MenuItem sx={{gap: 1}} onClick={()=> handleReplyType('verified_accounts')}>
+            <MenuItem sx={{gap: 1}} onClick={() => handleReplyType('verified_accounts')}>
               <ListItemIcon sx={{color: '#1976d2'}}>
                 <CheckCircleIcon fontSize={"large"}/>
               </ListItemIcon>
               <ListItemText>Verified accounts</ListItemText>
-              { replyType === 'verified_accounts'  && <ListItemIcon sx={{color: '#1976d2'}}>
+              {replyType === 'verified_accounts' && <ListItemIcon sx={{color: '#1976d2'}}>
                 <CheckIcon/>
               </ListItemIcon>}
             </MenuItem>
-            <MenuItem sx={{gap: 1}} onClick={()=> handleReplyType('only_account_you_mentioned')}>
+            <MenuItem sx={{gap: 1}} onClick={() => handleReplyType('only_account_you_mentioned')}>
               <ListItemIcon sx={{color: '#1976d2'}}>
                 <AlternateEmailIcon fontSize={"large"}/>
               </ListItemIcon>
               <ListItemText>Only accounts you mention</ListItemText>
-              { replyType === 'only_account_you_mentioned' && <ListItemIcon sx={{color: '#1976d2'}}>
+              {replyType === 'only_account_you_mentioned' && <ListItemIcon sx={{color: '#1976d2'}}>
                 <CheckIcon/>
               </ListItemIcon>}
             </MenuItem>

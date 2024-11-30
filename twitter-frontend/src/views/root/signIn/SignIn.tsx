@@ -1,18 +1,48 @@
 import Dialog from "@mui/material/Dialog";
 import Box from "@mui/material/Box";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
 import XIcon from "@mui/icons-material/X";
 import CloseIcon from "@mui/icons-material/Close";
-import { Button, TextField } from "@mui/material";
+import {Button, TextField} from "@mui/material";
 
 import apiClient from "../../../hooks/apiCaller";
 
+
+const commonTextFieldStyle = {
+  m: 1,
+  "& .MuiInputBase-root": {
+    color: "#fff",
+    "& fieldset": {
+      borderColor: "gray",
+    },
+    "&:not(.Mui-focused):hover fieldset": {
+      borderColor: "gray",
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: "#1976d2",
+    }
+
+  },
+  "& .MuiFormLabel-root": {
+    color: "gray",
+    "&.Mui-focused": {
+      color: "#1976d2",
+    },
+  },
+  width: "inherit",
+};
+
 const SignIn = () => {
-  const [modalOpen, setModalOpen] = useState(true);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [username, setUserName] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
   const navigate = useNavigate();
-  const [username, setUserName] = useState("");
-  const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    setModalOpen(true);
+  }, []);
 
   const handleClose = () => {
     setModalOpen(false);
@@ -33,7 +63,7 @@ const SignIn = () => {
 
   const validateLogin = async () => {
     try {
-      const { data } = await apiClient.post("/user/signin", {
+      const {data} = await apiClient.post("/user/signin", {
         username,
         password,
       });
@@ -51,7 +81,7 @@ const SignIn = () => {
         open={modalOpen}
         slotProps={{
           backdrop: {
-            style: { backgroundColor: "rgba(91, 112, 131, 0.4)" },
+            style: {backgroundColor: "rgba(91, 112, 131, 0.4)"},
           },
         }}
         sx={{
@@ -73,16 +103,16 @@ const SignIn = () => {
             color: "#fff",
           }}
         >
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Box sx={{display: "flex", justifyContent: "space-between"}}>
             <CloseIcon
-              sx={{ color: "#fff", position: "absolute", left: "20px" }}
+              sx={{color: "#fff", position: "absolute", left: "20px"}}
               fontSize="small"
               onClick={handleClose}
             />
-            <XIcon sx={{ color: "#fff" }} fontSize="medium" />
+            <XIcon sx={{color: "#fff"}} fontSize="medium"/>
           </Box>
 
-          <Box typography={"h4"} sx={{ paddingTop: 2, paddingBottom: 2 }}>
+          <Box typography={"h4"} sx={{paddingTop: 2, paddingBottom: 2}}>
             Sign in to X
           </Box>
           <Box
@@ -94,43 +124,13 @@ const SignIn = () => {
           >
             <TextField
               label="Phone, email or username"
-              sx={{
-                m: 1,
-                "& .MuiInputBase-root": {
-                  color: "#fff",
-                  "& fieldset": {
-                    borderColor: "gray",
-                  },
-                },
-                "& .MuiFormLabel-root": {
-                  color: "gray",
-                  "&.Mui-focused": {
-                    color: "#1976d2",
-                  },
-                },
-                width: "inherit",
-              }}
+              sx={commonTextFieldStyle}
               onChange={(event) => handleChange(event, "username")}
             ></TextField>
             <TextField
               label="Password"
               type="password"
-              sx={{
-                m: 1,
-                "& .MuiInputBase-root": {
-                  color: "#fff",
-                  "& fieldset": {
-                    borderColor: "gray",
-                  },
-                },
-                "& .MuiFormLabel-root": {
-                  color: "gray",
-                  "&.Mui-focused": {
-                    color: "#1976d2",
-                  },
-                },
-                width: "inherit",
-              }}
+              sx={commonTextFieldStyle}
               onChange={(event) => handleChange(event, "password")}
             ></TextField>
             <Button

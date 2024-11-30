@@ -5,41 +5,49 @@ import Box from "@mui/material/Box";
 import XIcon from "@mui/icons-material/X";
 import Button from "@mui/material/Button";
 import "./root.css";
-import { Outlet, useNavigate } from "react-router-dom";
+import {Outlet, useNavigate} from "react-router-dom";
 
 const Root = () => {
   const navigate = useNavigate();
 
-  const onSignInClickHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const onSignInClickHandler = (_event: React.MouseEvent<HTMLButtonElement>) => {
     navigate("/sign-in");
   };
 
-  const onSignUpClickHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const onSignUpClickHandler = (_event: React.MouseEvent<HTMLButtonElement>) => {
     navigate("/sign-up");
   };
   return (
     <>
-      <CssBaseline />
+      <CssBaseline/>
       <Container
-        maxWidth="lg"
-        sx={{ padding: 0, margin: 0, backgroundColor: "rgb(0, 0, 0)" }}
+        sx={{
+          padding: '0 !important',
+          margin: '0 !important',
+          backgroundColor: "rgb(0, 0, 0)",
+          height: "100vh",
+          minWidth: "100vw"
+        }}
       >
         <Box
-          display={"flex"}
-          sx={{ height: "100vh" }}
-          alignItems={"center"}
-          justifyContent={"space-evenly"}
+          sx={{
+            display: 'flex',
+            alignItems: "center",
+            height: '100%',
+            width: '100%',
+            justifyContent: "center"
+          }}
         >
           <Box display={"flex"} alignItems={"center"} justifyContent={"center"}>
-            <XIcon sx={{ color: "#fff", height: "400px", width: "400px" }} />
+            <XIcon sx={{color: "#fff", height: "400px", width: "400px"}}/>
           </Box>
-          <Box display={"flex"} flexDirection={"column"} sx={{ color: "#fff" }}>
+          <Box display={"flex"} flexDirection={"column"} sx={{color: "#fff"}}>
             <Box typography={"h2"}>Happening now</Box>
             <Box typography={"h4"}>Join today.</Box>
             <Box
               display={"flex"}
               flexDirection={"column"}
-              sx={{ width: "300px" }}
+              sx={{width: "300px"}}
             >
               <Button
                 variant="contained"
@@ -69,7 +77,7 @@ const Root = () => {
           </Box>
         </Box>
       </Container>
-      <Outlet />
+      <Outlet/>
     </>
   );
 };
