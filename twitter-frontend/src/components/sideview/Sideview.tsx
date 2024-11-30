@@ -16,7 +16,7 @@ interface SideViewProps {
 
 const SideView = (props: SideViewProps) => {
   const dispatch = useAppDispatch();
-  const {user, loading, error} = useSelector((state: RootState) => state.currentUser);
+  const {user} = useSelector((state: RootState) => state.currentUser);
   const navigate = useNavigate()
 
   useEffect(() => {

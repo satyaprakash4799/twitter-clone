@@ -47,7 +47,7 @@ const Profile = () => {
   const [tweetPage, setTweetPage] = useState<IPage>(initPage);
   const dispatch = useAppDispatch();
   const {
-    user, loading, error: _error, tweets, tweetsError, loadingTweets,
+    user, loading, tweets
   } = useSelector((state: RootState) => state.user);
   const {
     user: currentUser,
@@ -289,7 +289,7 @@ const Profile = () => {
                 hasMore={(tweets?.currentPage == 0) || (tweets?.currentPage !== tweets?.totalPages)}
                 loader={<Loader type={LoaderTypeEnum.circular}/>}
               >
-                {tweets?.tweets.map((tweet, index) => {
+                {tweets?.tweets.map((tweet) => {
                   return (
                     <TweetItem
                       key={tweet.id}

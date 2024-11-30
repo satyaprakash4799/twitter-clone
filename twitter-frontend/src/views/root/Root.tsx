@@ -10,11 +10,11 @@ import {Outlet, useNavigate} from "react-router-dom";
 const Root = () => {
   const navigate = useNavigate();
 
-  const onSignInClickHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const onSignInClickHandler = (_event: React.MouseEvent<HTMLButtonElement>) => {
     navigate("/sign-in");
   };
 
-  const onSignUpClickHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const onSignUpClickHandler = (_event: React.MouseEvent<HTMLButtonElement>) => {
     navigate("/sign-up");
   };
   return (
